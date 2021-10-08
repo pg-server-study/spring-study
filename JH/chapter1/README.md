@@ -1,6 +1,6 @@
 # 1장 오브젝트와 의존관계
 
----
+
 
 ## ✏️ 목표
 
@@ -8,7 +8,7 @@
 
 스프링이 무엇인지에 대하여 학습
 
----
+
 
 ## 1.1 초난감 DAO
 
@@ -129,7 +129,7 @@ public class UserDao {
 
 ```
 
----
+
 
 **스프링을 사용한 DAO 클래스**
 
@@ -193,7 +193,7 @@ public class UserDao {
 }
 ```
 
----
+
 
 ### 1.1.3 DAO 테스트 코드
 
@@ -284,7 +284,7 @@ public class UserDAOTest {
 - 코드를 개선후에 당장 또는 미래에 주는 유익이 무엇일까?
 - 해당 코드를 개선하지 않고 그대로 사용한다면 어떤 문제가 발생할까?
 
----
+
 
 ## 1.2 DAO의 분리
 
@@ -472,10 +472,10 @@ public class UserDao {
 작성한 테스트 코드를 실행함으로써 해당 메소드를 테스트할 수 있다.
 
 ```
-2021-10-07 23:31:39.956 DEBUG 13428 --- [    Test worker] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-10-07 23:31:39.956 DEBUG 13428  [    Test worker] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. insert into users (id, name, password) values('whiteship','백기선','married')
 
-2021-10-07 23:31:39.970 DEBUG 13428 --- [    Test worker] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
+2021-10-07 23:31:39.970 DEBUG 13428  [    Test worker] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
 1. select * from users where id = 'whiteship'
 ```
 
@@ -620,7 +620,7 @@ getConnection 메소드를 재구현 해달라고 요청하면서 납품을 하�
 - 슈퍼 클래스가 변경된다면 모든 서브클래스를 수정해야한다
 - UserDao외의 Dao 클래스들이 계속 만들어진다며 getConnection()의 코드가 매 DAO 클래스마다 중복되는 심각한 문제가 발생할 것이다.
 
----
+
 
 ## 1.3 DAO의 확장
 
@@ -901,7 +901,7 @@ UserDao에 전혀 영향을 주지 않고도 얼마든지 기능을 확장할 �
 
 결론으로 Connection 이 변경되도 UserDao는 신경을 안써도되는 구조가 낮은 결함도다
 
----
+
 
 ## 1.4 제어와 역전
 
@@ -1092,7 +1092,7 @@ UserDaoTest는 DaoFactory가 만들고 초기화해서 공급해주는 Connectio
 
 다음장부터 스프링이 제공하는 IoC에 대해 살펴보자.
 
----
+
 
 ## 1.5 스프링의 IoC
 
@@ -1249,7 +1249,7 @@ ApplicationContext는 애플리케이션에서 IoC를 적용해서 관리할 모
   ApplicationContext 나 BeanFactory를 가리킨다.
 
 
----
+
 
 ## 1.6 싱글톤 레지스트리와 오브젝트 스코프
 
@@ -1371,7 +1371,7 @@ SYstem.out.println(dao3 == dao4); // true
 
 - Sesseion
 
----
+
 
 ## 1.7 의존관계 주입(DI)
 

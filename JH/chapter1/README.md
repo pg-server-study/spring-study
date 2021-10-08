@@ -1,3 +1,5 @@
+[노션을 참고하면 더욱 좋습니다.](https://near-sunscreen-c35.notion.site/1-6f74504f8d78463ebcc01a85f5db58fe)
+
 # 1장 오브젝트와 의존관계
 
 

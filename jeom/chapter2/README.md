@@ -146,5 +146,23 @@ junit는 프레임 워크다 . 1장에서 프레임 워크의 기본 동작원�
 
 따라서 프레임워크에서 동작하는 코드는 main() 메소드도 필요 없고 오브젝트를 만들어서 실행 시키는 코드도 만들 필요도없다.
 
+> 테스트 메소드 전환
+>
+> 테스트가 main() 메소드로 만들어졌다는 건 제어권을 직접 갖는다는 의미이기 때문에 main()은 프레임워크에 적용하기 적합하지 않는다. 그래서 가장 먼저 할일은 main() 메소드에 있던 테스트 코드를 일반 메소드로 옮기는 것이다.
+
+```java
+public class UserDaoTest {
+    
+    @Test //Junit에게 테스트용 메소드임을 알려준다 
+	public void addAndGet() throws SQLException {	
+        //반드시 public로 선언돼야 한다.
+		ApplicationContext context = new 
+			ClassPathXmlApplicationContext( pplicationContext .x ml ") ; 
+		UserDao dao = context.getBean("userDao" , UserDao.class);
+		...//생략
+	}
+}
+```
+
 
 

@@ -1,3 +1,5 @@
+
+
 # 2장 테스트 
 
 테스트란 무엇이며 , 대표적인 테스트 프레임워크를 소개하고 , 이를 이용한 학습 전략을 알아볼것이다 .
@@ -163,6 +165,123 @@ public class UserDaoTest {
 	}
 }
 ```
+
+>검증코드전환
+>
+>aeesrtThat() 메소드는 첫번째 파라미터의 값을 뒤에 나오는 매처라고 불리는 조건으로 일치하면 
+>
+>다음으로 넘어가고 , 아니면 테스트가 실패하도록 만들어준다.
+
+```java
+public class UserDaoTest {
+	public void addAndGet() throws SQLException {
+		ApplicationContext context = new GenericXmlApplicationContext( 
+			appl icationContext .xml"); 
+			
+		UserD dao = context.getBean("userDao" , UserDao.class); 
+		User user = new User(); 
+		user. setld ( “gyumee") ; 
+		user. setName(" 박성 철 "); 
+		user.setPassword("springnol");
+		
+		dao.add(user); 
+		
+		User user2 = dao.get(user.getld()); 
+		
+		assertThat(user2.getName(), is(user.getName())); 
+		assertThat(user2.getPassword(), is(user.getPassword()));
+	}
+}
+```
+
+### 테스트 결과의 일관성 
+
+> deleteAll() , getCount()  추가
+>
+> 매번 User 테이블 데이터를 삭제해줘야한다 . 이전테스트 떄문에 등록된 중복 데이터가 생길수 있음
+
+```java
+public void deleteAll() throws SQLException { 
+	Connection c = dataSource .gètConnection(); 
+	
+	PreparedStatement ps = c.prepareStatement(“delete from users ");
+	ps.executeUpdate(); 
+	ps. close(); 
+	c .close();
+}
+```
+
+```java
+public int getCount() throws SQLException {
+	Connection c = dataSource.getConnection(); 
+	
+	PreparedStatement ps = c. prepareStatement("select count(* ) from users");
+    
+	ResultSet rs = ps .executeQuery(); 
+	rs .next(); 
+	int count = rs.getlnt(l); 
+	
+	rs. close(); 
+	ps. close(); 
+	c .close(); 
+	
+	return count;
+}
+```
+
+```java
+dao.deleteAll(); 
+assertThat(dao.getCount(), is(0));
+//User 생성 전에 실행하도록 추가
+assertThat(dao.getCount(), is(1)); 
+//생성후에 실행하도록 추가
+```
+
+동일한 결과를 보장하는 테스트가 만들어 졌다 .하지만 한가지 결과만 검증하고 마는 것은 상당히 위험하다 . getCount( )에 대한 좀더 꼼꼼한 테스트를 만들어 보자 .
+
+> 여러개의 user를 등록해가면서 getCount()의 결과를 매번 확인해보겠다.
+>
+> 테스트를 만들기 전에 먼저 User 클래스에 한번에 모든 정보를 넣을 수 있도록 초기화가 가능한 생성자를 추가한다 . 
+
+```java
+public User(String id, String name , String password) {
+		this.id = id; 
+		this.name = name; 
+		this.password = password;
+}
+public User(){
+	//자바빈의 규약을 따르는 클래스에 생성자를 명시적으로 추가할 경우 
+	//파라미터가 없는 디폴트 생성자도 함께 정의 
+}
+```
+
+```java
+@Test
+public void count() throws SQLException { 
+	ApplicationContext context = new GenericXmlApplicationContext ( 
+		"appl icationGontext .xml"); 
+		
+	UserDao dao = context.getBean("userDao" , UserDao .class); 
+	User userl = new User("gyumee" , "박성철“, "springnol "); 
+	User user2 = new User("leegw700 ,"길원", "pringno2") ; 
+	User user3 = new User("bumjin" ,”박범진" ,"springno3"); 
+	
+	dao.deleteAll(); 
+	assertThat(dao.getCount(), is(0)); 
+	
+	dao.add(userl); 
+	assertThat(dao .getCount() , iS(l)); 
+	
+	dao .add(user2); 
+	assertThat(dao .getCount() , is(2)); 
+                          
+    dao.add(user3); 
+	assertThat(dao.getCount(), is(3));
+                          
+}
+```
+
+
 
 
 

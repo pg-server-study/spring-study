@@ -6,6 +6,7 @@
 - 학습한 챕터는 MarkDown 으로 정리해서 깃허브 각자의 branch 에 파일을 올립니다.
 - 매주 금~일 중으로 디스코드를 활용하여 학습한 내용을 발표 및 토론 합니다.
 - 토론 후 정리한 MD 파일의 PR을 생성한후 Master에 병합합니다.
+- 가장 정리를 잘한 사람을 **BEST**로 지정하여 Readme 에 작성합니다.
 
 ## 👨‍💻 스터디원
 
@@ -23,7 +24,7 @@
 
 |닉네임| 정리
 | ---- | --- |
-| BEST | [1장 - 오브젝트와 의존관계](https://reminiscent-headlight-ee3.notion.site/1-fd3ff68f48434297a01ace0577a52e76)
+| BEST | [@chaenabi](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter1)
 | pursue503 | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter1)
 | minnim6 | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/blob/main/jeom/README.md.md)
 | chaenabi | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter1)

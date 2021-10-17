@@ -301,7 +301,7 @@ public class UserDAOTest {
 }
 ```
 
-![Untitled](2%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%90%E1%85%A6%E1%84%89%E1%85%B3%E1%84%90%E1%85%B3%203b235ecc186949c182344257de7fc8f4/Untitled.png)
+![Untitled](https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter2/image/Untitled.png?raw=true)
 
 성공한다면 위와 같이 성공표시가 뜨게된다.
 

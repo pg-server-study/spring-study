@@ -1,6 +1,7 @@
+[노션을 참고하면 더욱 좋습니다.](https://near-sunscreen-c35.notion.site/2-b28a6b1bf46b4523959dc86cb5aa111e)
+
 # 2장 테스트
 
----
 
 ## 2.1 UserDaoTest 다시 보기
 
@@ -26,7 +27,7 @@
 
 테스트 코드의 유용점은 어마어마하다.
 
----
+
 
 ### 2.1.2 UserDaoTest의 특징
 
@@ -181,7 +182,7 @@ UserDaoTest의 한 가지 특징은 테스트할 데이터가 코드를 통해 �
 
 테스트코드로 확인을 하고 개선하였기에 작업속도가 빨라지고 더욱 쉽게 리팩토링을 할수 있었던 것이다.
 
----
+
 
 ### 2.1.3 UserDaoTest의 문제점
 
@@ -200,7 +201,7 @@ UserDaoTest의 한 가지 특징은 테스트할 데이터가 코드를 통해 �
 - 매번 main을 실행해야한다.
 - 테스트가 무수히 많아지면 그 많은걸 다 실행해야한다.
 
----
+
 
 ## 2.2 UserDaoTest 개선
 
@@ -366,7 +367,7 @@ public class JUnitTest {
 ```
 
 | 메소드 | 설명 |
-| ----- | ---- |
+| -- | - |
 | isEqualTo(obj) | obj와 같다 |
 | isNotEqualTo(obj) | obj와 다르다 |
 | isEqualToIgnoringCase(str) | 파라미터와 같다  ( 대소문자 무시) |
@@ -407,7 +408,7 @@ public class JUnitTest {
 | isNotln(..obj) | 여러 obj 와 모두 다르다 |
 | filteredOn(..) | list필터 |
 | extracting(..) | list 프로퍼티 값 |
----
+
 
 ## 2.5 학습 테스트로 배우는 스프링
 

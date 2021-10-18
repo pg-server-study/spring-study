@@ -28,3 +28,15 @@
 | pursue503 | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter1)
 | minnim6 | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/blob/main/jeom/README.md.md)
 | chaenabi | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter1)
+
+### Chapter2
+
+**테스트**
+
+| 닉네임    | 정리                                                         |
+| --------- | ------------------------------------------------------------ |
+| BEST      | [@pursue503](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter2) |
+| pursue503 | [2장 - 테스트](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter2)|
+| minnim6   | [2장 - 테스트](https://github.com/pg-server-study/spring-study/tree/main/jeom/chapter2)|
+| chaenabi   | [2장 - 테스트]                                                             |
+

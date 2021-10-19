@@ -38,5 +38,5 @@
 | BEST      | [@pursue503](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter2) |
 | pursue503 | [2장 - 테스트](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter2)|
 | minnim6   | [2장 - 테스트](https://github.com/pg-server-study/spring-study/tree/main/jeom/chapter2)|
-| chaenabi   | [2장 - 테스트]                                                             |
+| chaenabi   | [2장 - 테스트](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter2)                                                             |
 

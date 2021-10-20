@@ -192,6 +192,318 @@ public class UserDaoDeleteAll extends UserDao {
 
 ### 전략패턴의 적용
 
-개방 패쇄 원칙OCP을 잘 지키는 이면서도 템플릿 메소드 패턴보다 유연하고 확  장성이 뛰어난 것이， 오브젝트를 아예 둘로 분리하고 클래스 레벨에서는 인터페이스  를 통해서만 의존하도록 만드는 전략 패턴이다.
+> 개방 패쇄 원칙OCP을 잘 지키는 이면서도 템플릿 메소드 패턴보다 유연하고 확장성이 뛰어난 것이， 오브젝트를 아예 둘로 분리하고 클래스 레벨에서는 인터페이스  를 통해서만 의존하도록 만드는 전략 패턴이다.
 
-219p
+```java
+public interface StatementStrategy {
+	PreparedStatement makePreparedStatement(Connection c) throws SQLException;
+}
+```
+
+```java
+public class DeleteAllStatement implements StatementStrategy {
+	public PreparedStatement makePreparedStatement(Connection c) throws 
+		SQLException {
+			PreparedStatement ps = c.prepareStatement("delete from users"); 
+			return ps;
+	}
+}
+```
+
+```java
+public void deleteAll() throws SQLException{
+    ...
+	try{
+		c = dataSource.getConnection(); 
+        
+		StatementStrategy strategy = new DeleteAllStatement(); 
+		ps = strategy.makePreparedStatement(c); 
+        
+		ps.executeUpdate(); 
+		} catch (SQLException e) {
+   ...
+}
+```
+
+인터페이스를 통해 전략 패턴을 적용했지만 , 이미 구체  적인 전략 클래스인 DeleteAllStatement를 사용하도록 고정되어 있다.
+
+### DI 적용을 위한 클라이언트/컨텍스트 분리
+
+전략 패턴에 따르면 Context 가 어떤 전략을 사용하게 할 것인가는 Context를 시용하는 앞단의 Client가 결정하는 게 일반적이다. 
+
+Client 가 구체적인 전략의 하나를 선택하고 오브젝트로 만들어서 Context 에 전달히는 것이다.
+
+결국 이 구조에서 전략 오브젝트 생성과 컨텍스트로의 전달을 담당히는 책임을 분리시킨 것이 바로 ObjectFactory 이며， 이를 일반화한 것이 앞에서 살펴봤던 의존관계 주입이 였다.
+
+> 컨텍스트에 해당하는 부분은 별도의 메소드로 독립시격보자.
+
+```java
+public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws 
+SQLException { 
+		Connection c = null; 
+		PreparedStatement ps = null; 
+		
+	try {
+		c = dataSource .getConnection(); 
+		
+		ps = stmt.makePreparedStatement(c); 
+		
+		pS .executeUpdate(); 
+	} catch (SQLException e) { 
+		throw e; 
+	} finally { 	
+		if (ps != null) { try { ps .close(); } catch (SQLException e) {} } 
+		if (c != null) { try {c.close(); } catch (SQLException e) {} }
+	}
+}
+```
+
+클라이언트로부터  StatementStrategy 타입의 전략 오브젝트를 제공받고 JDBC try/catch/finally  구조로 만들어진 컨텍스트 내에서 작업을 수행한다.
+
+> 클라이언트 책임을 갖도록 재구성한 deleteAll () 메소드
+
+```java
+public void deleteAll() throws SQLException { 
+	StatementStrategy st = new DeleteAllStatement();  
+	jdbcContextWithStatementStrategy(st);
+}
+```
+
+> add() 메소드 수정	
+
+```java
+public class AddStatement implements StatementStrategy { 
+	public PreparedStatement makePreparedStatement(Connection c) 
+		throws SQLException { 
+	PreparedStatement ps = 
+	c.prepareStatement('insert into users(id, name , password) 
+	values(?,?,?)"); 
+	ps.setString(l , user.getld()); 
+	ps.setString(2, user.getName()); 
+	ps.setString(3, user.getPassword()); 
+	
+		return ps;
+	}
+}
+```
+
+```java
+public class AddStatement implements StatementStrategy { 
+	User user; 
+	public AddStatement(User user) { 
+		this.user = user; 
+	}
+public PreparedStatement makePreparedStatement(Connection c) ( 
+		pS.setString(l , user.getld()); 
+		ps.setString(2, user.getName()); 
+		ps.setString(3, user.getPassword());
+	}
+}
+```
+
+```java
+public void add(User user) throws SQLException {
+	StatementStrategy st = new AddStatement(user); 
+	jdbcContextWithStatementStrategy(st);
+}
+```
+
+지금까지 해옹 작업만으로도 많은 문제점을 해결하고 코드도 깔끔하게 만들긴 했지만， 
+
+먼저 DAO 메소드마다 새로운  StatementStrategy 구현 클래스를 만들어야 한다는 점과
+
+ DAO 메소드에서 StatementStrategy 에 전달할 User와 같은 부가적인 정보가 있는 경우 이를 위해 오브젝트를 전달받는 생성자  와 이를 저장해둘 인스턴스 변수를 번거롭게 만들어야 한다는 두가지 문제점이 있다.
+
+이 두 가지 문제를 해결할 수 있는 방법을 생각해보자.
+
+### 로컬 클래스
+
+> StatementStrategy 전략 클래스를 매번 독립된 파일로 만들지 말고 UserDao 클래스 안에 내부 클래스로 정의해버  리는 것이다.
+
+```java
+public void add(User user) throws SQLException { 
+	class AddStatement implements StatementStrategy { //내부에 선언한 로컬클래스
+		User user; 
+        
+		public AddStatement(User user) {
+			this.user = user; 
+       	}
+        
+	public PreparedStatement makePreparedStatement(Connection c) 
+		throws SQLException {
+	PreparedStatement ps = 
+		c.prepareStatement("insert into users(id, name , password) 
+			values(?,?,?)") ; 
+		ps.setString(l , user.getld()); 
+		ps.setString(2, user.getName()); 
+		ps.setString(3, user.getPassword()); 
+                           
+		return ps;
+        }
+     }
+     StatementStrategy st = new AddStatement(user); 
+	 jdbcContextWithStatementStrategy(st);
+ }
+```
+
+```java
+public void add(final User user) throws SQLException { 
+	class AddStatement implements StatementStrategy { 
+		public PreparedStatement makePreparedStatement(Connection c) 
+			throws SQLException { 
+		PreparedStatement ps = c.prepareStatement( 
+			insert into users(id, name , password) values(7,7,7)"); 
+		pS.set5tring(1 , user.getld());  
+		pS.set5tring(2, user.getName());  
+		pS.set5tring(3, user.getPassword());
+		
+		return ps;
+		}
+	}
+		StatementStrategy st = new AddStatement(); 
+        //피라미터로 user을 전달하지 않아도된다.
+		jdbcContextWith5tatement5trategy(st); 
+}
+```
+
+### 익명 내부클래스
+
+> 한 가지 더 욕심을 내보자. AddStatement 클래스는 add() 메소드에서만 사용할 용도로  만들어졌다. 그렇다면 좀 더 간결하게 클래스 이름도 제거할 수 있다. AddStatement를 익명 내부 클래스로 만들어보자.
+
+```java
+StatementStrategy st = new StatementStrategy() { 
+	public PreparedStatement makePreparedStatement(Connection c) 
+	throws SQLException { 
+		PreparedStatement ps = 
+			c.prepareStatement(“insert into users(id, name , password) 
+				values(? ,?,?)"); 
+		pS .setString(1 , user.getld()); 
+		ps.setString(2, user.getName()); 
+		pS.setString(3, user.getPassword()); 
+                               
+		return ps;
+	}
+};
+```
+
+```java
+public void add(final User user) throws SQLException { 
+	jdbcContextWithStatementStrategy( 
+			new StatementStrategy() { 
+				public PreparedStatement makePreparedStatement(Connection c) 
+    				throws SQLException { 
+						PreparedStatement ps = 
+							c. prepareStatement("insert into users(id, name , 
+								password) values(?,?,?)’); 
+						pS .setString(1 , user.getld()); 
+						pS setString(ι user.getName()); 
+						pS .setString(3, user.getPassword()); 
+                    
+						return ps;
+                    
+                }
+            }
+        }
+     );
+}
+```
+
+### JdbcContext의 분리
+
+> jdbcContextWithStatementStrategy() 를 UserDao 클래스 밖으로 독립시켜서 모든 DAO가 사용할 수 있게 해보자.
+
+```
+public class JdbcContext {
+	private DataSource dataSource;
+    
+	public void setDataSource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
+	
+	public void workWithStatementStrategy(StatementStrategy stmt) throws 
+		SQLException { 
+			Connection c = null; 
+			PreparedStatement ps = null; 
+		try {
+        	c = this.dataSource .getConnection(); 
+			ps = stmt.makePreparedStatement(c); 
+			ps.executeUpdate(); 
+		} catch (SQLException e) { 
+			throw e; 
+		}finally {
+			if (ps != null) { try ( pS .close(); } catch (SQLException e) {} } 
+			if (c != null) { try (c .close(); } catch (SQLException e) {} }
+		}
+	}
+}
+```
+
+> UserDao가 분리된 JdbcContext를 DI 받아서 사용할 수 있게만든다.
+
+```java
+public class UserDao {
+	private JdbcContext jdbcContext; 
+	
+	public void setJdbcContextOdbcContext jdbcContext) ( 
+		this.jdbcContext = jdbcContext; 
+	}
+	
+	public void add(final User user) throws SQLException ( 
+		this.jdbcContext.workWithStatementStrategy( 
+			 new StatementStrategy() { ... }
+		 );
+ 	}
+ 	
+	 public void deleteAll() throws SQLException ( 
+		this.jdbcContext.workWithStatementStrategy( 
+			new StatementStrategy() { . .. }
+		);
+}
+```
+
+새롭게 작성된 오브젝트 간의 의존관계를 살며보고 이를 스프링 설정에 적용해보자. 
+
+ 프링의 DI는 기본적으로 인터페이스를 사이에  두고 의존 클래스를 바꿔서 사용하도록 하는 게 목적이다. 하지만 이 경우 JdbcContext  는 그 자체로 독립적인 JDBC 컨텍 트를 제공해주는 서비스 오브젝트로서 의미가 있을 뿐이고 구현 방법이 바뀔 가능성은 없다. 
+
+따라서 인터페이스를 구현하도록 만들지않았다
+
+인터페이스를 사용해서 클래스를 자유롭게 변경할 수 있게 하지는 않았지만，  JdbcContext를 UserDao와 Di 구조로 만들어야 할 이유를 생각해보자.
+
+- . JdbcContext는 그 자체로 변경되는 상태정보를 갖고 있지 않다.  읽기 전용이므로 싱글톤이 되는데 아무런 문제가 없다 . 
+-  JdbcContext 가 Di 를 통해 다른 빈에 의존하고 있기 때문이다. 이 두번째 이유가 중요하다.  JdbcContext는 dataSource 프로퍼 티를 통해 DataSource 오브젝트를  주입받도록 되어있다. DI 를 위해서는 주입되는 오브젝트와 주입받는 오브젝트 양쪽 모  두 스프링 빈으로 등록돼야 한다.
+
+> tip ) 단，이런 클래스를 바로 사용하는 코드 구성을 DI에 적용히는 것은 가장 마지막 단계  에서 고려해볼 사항임을 잊지 말자.
+
+### 코드를 이용하는 수동 DI
+
+JdbcContext를 스프링의 빈으로 등록해서 UserDao에 DI 히는 대신 사용할 수 있는 방법이 있다. UserDao 내부에서 직접 DI를 적용하는 방법이다.
+
+이 방법을 쓰려면 JdbcContext를 싱글톤으로 만들려는것은 포기해야한다. 물론 DAO 메소드가 호출 될때마다 JdbcContext 오브젝트를 새로 만드는 방법을 사용해야한다는것은 아니다. 조금 타협을 해서 DAO 마다 하나의 JdbcContext의 오브젝트를 갖고 있게하는 것이다.
+
+JdbcContext를 스프링 빈으로 등록하지 않았으므로 다른 누군가가 JdbcContext 의  생성과 초기화를 책임져야 한다.. JdbcContext 의 제어권은 UserDao가 갖는 것이 적당하다.
+
+> JdbcContext 에 대한 제어  권을 갖고 생성과 관리를 담당하는 UserDao에게 DI까지 맡긴다.
+>
+> JdbcContext 에 주입해줄 의존 오브젝트인 DataSource는 UserDao가 대신 DI 받도록 하면 된다.
+>
+> UserDao는 JdbcContext 오브젝트를 만들면서 DI 받은 DataSource 오브젝트  를 JdbcContext 의 수정자 메소드로 주입해준다.
+
+```java
+public class UserDao {
+
+private JdbcContext jdbcContext;
+
+pblic void setDataSource(DataSource dataSource){
+	this.jdbcContext = new JdbcContext();
+	
+	this.jdbcContext.setDataSource(dataSource);
+	
+	this.dataSource = dataSource;
+}
+```
+
+이 방법의 장점은 굳이 인터페이스를 두지 않아도 될 만큼 긴밀한 관계를 갖는 DAO  클래스와 JdbcContext를 어색하게 따로 빈으로 분리하지 않고 내부에서 직접 만들어  시용하면서도 다른 오브젝트에 대한 DI를 적용할 수 있다.
+
+>  바뀌지 않는 일정한 때턴을 갖는  작업 흐름이 존재하고 그중 일부분만 자주 바꿔서 사용해야 히는 경우에 적합한 구조 다. 전략 패턴의 기본 구조에 익명 내부 클래스를 활용한 방을 스프링에서는 **템플릿 / 콜백 패턴**이라고 부른다.
+
+242p

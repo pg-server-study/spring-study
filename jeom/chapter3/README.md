@@ -1,8 +1,6 @@
-
-
 # 3장 템플릿
 
-**템플릿이란 ?** 바뀌는 성질이 다른 코드 중에서 **변경이 거의 일어나지 않으며 일정한 패턴으로 유지되는 특성을 가진 부분을 자유롭게 변경이 되는 성질을 가진 부분으로부터 독립 **시켜서 효과적으로 활용 할 수 있도록 하는 방법.
+**템플릿이란 ?** 바뀌는 성질이 다른 코드 중에서 **변경이 거의 일어나지 않으며 일정한 패턴으로 유지되는 특성을 가진 부분을 자유롭게 변경이 되는 성질을 가진 부분으로부터 독립**시켜서 효과적으로 활용 할 수 있도록 하는 방법.
 
 > 다시 보는 초난감 Dao 
 
@@ -504,6 +502,190 @@ pblic void setDataSource(DataSource dataSource){
 
 이 방법의 장점은 굳이 인터페이스를 두지 않아도 될 만큼 긴밀한 관계를 갖는 DAO  클래스와 JdbcContext를 어색하게 따로 빈으로 분리하지 않고 내부에서 직접 만들어  시용하면서도 다른 오브젝트에 대한 DI를 적용할 수 있다.
 
+### 템플릿과 콜백
+
 >  바뀌지 않는 일정한 때턴을 갖는  작업 흐름이 존재하고 그중 일부분만 자주 바꿔서 사용해야 히는 경우에 적합한 구조 다. 전략 패턴의 기본 구조에 익명 내부 클래스를 활용한 방을 스프링에서는 **템플릿 / 콜백 패턴**이라고 부른다.
 
-242p
+댐플릿은 고정된 작업 흐름을 가진 묘드를 재사용한다는 의미에서 붙인 이름이다. 콜백은 템플릿 안에서 호출되는 것을 목적으로 만들어진 오브젝트를 말한다.
+
+콜백은 일반적으로 하나의 메소드를 가진 인터페이스를 구현한 익명 내부 클래스로 만들어진다고 보면 된다.
+
+콜백 인터페이스의 메소드에는 보통 파라미터가 있다. 이 파라미터는 템플릿의 작업 흐름 중에 만들어지는 컨텍스트 정보를 전달받을 때 사용된다. 
+
+```java
+public void deleteAll() throws SQLException ( 
+	executeSql(‘ delete from users"); //변하는 sql문장
+}
+```
+
+```java
+private void executeSQl(final String Query) throws SQLException {
+	this.jdbcContext.workWithStatementStrategy{
+		new StatementStrategy() {
+			public PreparedStatement makePreparedStatement(Connection c) 
+						throws SQLException { 
+					return c.prepareStatement(Query);
+					//변하지 않는 콜백 클래스 정의와 오브젝트 생성 
+			}
+		}
+	);
+}
+```
+
+이렇게 재사용 가능한 콜백을 담고 있는 메소드라면 DAO가 공유할 수 있는 템플릿 클래스 안으로 옮겨도 된다. 
+
+엄밀히 말해서 템플릿은 JdbcContext 클래스가 아니라  workWithStatementStrategy() 메소드이므로 JdbcContext 클래스로 콜백 생성과 댐플  릿 호출이 담긴 executeSql () 메소드를 옮긴다고 해도 문제 될 것은 없다.
+
+```java
+public class JdbcContext { 
+public void executeSql(final String query) throws SQLException {
+	workWithStatementStrategy{
+		new StatementStrategy() {
+			public PreparedStatement makePreparedStatement(Connection c) 
+				throws SQLException {
+			return c.prepareStatement(query);
+			}
+		}
+	);
+}
+```
+
+> UserDao의 메소드에서도 리스트  3-29와 같이 jdbcContext를 통해 executeSql() 메소드를 호출하도록 수정
+
+```java
+public void deleteAll() throws SQLException { 
+	this.jdbcContext.executeSql("delete from users");
+}
+```
+
+일반적으로는 성격이 다른 묘드들은 가능한 한 분리하는 편이 낫지만， 이 경우는 반대다. 하나의 목적을 위해 서로 긴밀하게 연관되어 동작하는 웅집력이 강한 코드들이기  때문에 한 군데 모여 있는 게 유리하다.
+
+### 테스트와 try/catch/finally
+
+설명보다는 리팩토링 위주여서 , 프로젝트로 작성하였습니다.
+
+[ 링크에 프로젝트에서 참고해주세요. ]()
+
+( 현재 머지하지 않은상태라 링크를 비워두웠습니다 . chapter3에서 Test 프로젝트를 확인해주세요 )
+
+리팩토링 순서는 상위폴더에 Calculator → BufferedReader 패키지 → Lineread 패키지  → Generics 패키지 순으로 참고해주시면됩니다 : ) 
+
+### 스프링의 JdbcTamplate
+
+스프링은 JDBC를 이용히는 DAO에서  사용할 수 있도록 준비된 다양한 템플릿과 콜백을 제공한다.
+
+```java
+public class UserDao {
+
+	private JdbcTemplate jdbcTemplate; 
+	
+		public void setDataSource(DataSource dataSource) {
+			this.jdbcTemplate = new JdbcTemplate(dataSource); 
+			
+			this.dataSource = dataSource;
+}
+```
+
+```java
+public void deleteAll() { 
+	this.jdbcTemplate.update(
+		new PreparedStatementCreator() ( 
+			public PreparedStatement createPreparedStatement(Connection con) 
+					throws SQLException ( 
+				return con.prepareStatement( "delete from users");
+			}
+		}
+	);
+}
+```
+
+### JdbcTemplate 메소드 정리
+
+| 메소드           | 설명                                                         |
+| ---------------- | ------------------------------------------------------------ |
+| UPDATE()         | 치환자를 가진 SQL을 만든 후 함께 제공하는 파라미터를 활용하면 된다. |
+| QueryForlnt()    | SQL 쿼리를 실행하고 **정수의 결과 값(Integer 타입)**을 가져올 때 사용하는 메소드 |
+| QueryForObject() | SQL의 DML 중 SELECT를 실행했을 때 **하나의 객체(Object) 결과 값**이 나올 때 사용하는 메소드 |
+| query()          | queryForInt()가 하나의 결과 값을 위한 메소드인 반면, 많은 결과 값(로우 값)을 처리 할 수 있는 메소드 |
+
+> update 예시
+
+```java
+this.jdbcTemplate.update("insert into users(id, name , password) values(? ,?,?)", 
+user.getld() , user .getName() , user .getPassword());
+```
+
+> QueryForlnt() 예시
+
+```java
+public int getCount() {
+	return this.jdbcTemplate .queryForlnt("select count(*) from users'’);
+}
+```
+
+> QueryForObject() 예시
+
+```java
+public User get(String id ) { 
+	return this.jdbcTemplate.QueryForObject("select * from users where id = ?" , 
+		new Object[] {id}, //sql에 바인딩할 파라미터값, 가변인자대신 배열을 사용
+		new RowMapper<User>(){
+			public User mapRow(ResultSet rs, int rowNum) 
+				throws SQLException {
+				User user = new User(); 
+				user.setld(rs.getString("id")); 
+				user.setName(rs.getString("name'’ )); 
+				user.setPassword(rs.getString("password")); 
+				return user;
+		} //resultset한 로우값의 결과를 오브젝트에 매핑해주는 RowMapper 콜백 
+	});
+}
+```
+
+> query()예시
+
+```java
+public List<User> getAll() {
+	return this.jdbcTemplate.Query("select * from users order by id" , 
+		new RowMapper<User>() {
+			public User mapRow(ResultSet rs, int rowNum) 
+					throws SQLException ( 
+				User user = new User(); 
+				user.setld(rs.getString("id")); 
+				user .setName(rs .getString("name")); 
+				user.setPassword(rs.getString("password")); 
+				return user; 
+			}
+		});
+}
+```
+
+### 재사용 가능하도록 독립시킨 RowMapper
+
+```java
+public class UserDao{
+	private RowMapper<User> userMapper = 
+		new RowMapper<User>() {
+			public User mapRow(ResultSet rs, int rowNum) 
+					throws SQLException ( 
+				User user = new User(); 
+				user.setld(rs.getString("id")); 
+				user .setName(rs .getString("name")); 
+				user.setPassword(rs.getString("password")); 
+				return user; 
+			}
+		}
+}
+```
+
+```java
+public User get(String id) ( 
+	return this.jdbcTemplate.QueryForOb ject(“select * frαn users where id = 7" , 
+		new Object[] {id} , this,userMapper);
+}
+public List<User> getAll() ( 
+    return this.jdbcTemplate.Query( elect * from users order by id" , 
+		this, userMapper);
+}
+```
+

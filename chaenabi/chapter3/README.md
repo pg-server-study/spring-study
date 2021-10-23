@@ -8,7 +8,7 @@ Tags: 백엔드 스터디, 템플릿
 
 ## 3.1 다시 보는 초난감 DAO
 
----
+
 
 ```java
 public class UserDao {
@@ -59,7 +59,7 @@ public void deleteAll() throws ClassNotFoundException, SQLException {
 
 ### 3.1.1 예외처리 기능을 갖춘 DAO
 
----
+
 
 예외처리를 DAO에 추가해보자.
 
@@ -139,11 +139,11 @@ public int getCount() throws SQLException (
 
 ## 3.2 변하는 것과 변하지 않는 것
 
----
+
 
 ### 3.2.1 JDBC try/catch/finally 코드의 문제점
 
----
+
 
 코드를 보면서 엄청난 답답함을 느끼지 않았는가?
 **try 블록이 2중으로 중첩되는데다 모든 메소드마다 반복된다.** 
@@ -200,7 +200,7 @@ public int getCount() throws SQLException (
 
 ### 3.2.2 분리와 재사용을 위한 디자인 패턴 적용
 
----
+
 
 - 먼저 UserDAO의 메소드를 개선하는 작업부터 시작해보자.
 
@@ -279,7 +279,7 @@ public class JdbcContext {
 
 ## 3.3 JDBC 전략패턴의 최적화 및 3.4 컨텍스트와 DI
 
----
+
 
 ```java
 public class AddStatement implements StatementStrategy { 
@@ -357,7 +357,7 @@ public class UserDao {
 
 ## 3.5 템플릿과 콜백
 
----
+
 
 UserDao와 StatementStrategy, JdbcContext를 이용해 만든 코드는
 일종의 전략 패턴이 적용된 것이라고 볼 수 있다.
@@ -378,7 +378,7 @@ UserDao와 StatementStrategy, JdbcContext를 이용해 만든 코드는
 
 ### 3.5.1 템플릿/콜백의 동작원리
 
----
+
 
 템플릿은 고정된 작업흐름을 가진 코드를 재사용한다는 의미에서 붙인 이름이다.
 콜백은 템플릿 안에서 호출되는 것을 목적으로 만들어진 객체를 말한다.
@@ -462,7 +462,7 @@ public class UserDao {
 
 ### 3.5.3 템플릿/콜백의 응용
 
----
+
 
 ```java
 // 템플릿/콜백 패턴 인터페이스 정의
@@ -537,7 +537,7 @@ public class FileModifier {
 
 ## 3.6 스프링의 JdbcTemplate
 
----
+
 
 템플릿/콜백 패턴은 스프링에 국한된 개념은 아니므로 스프링없이도 사용할 수 있지만,
 스프링은 템플릿/콜백 패턴을 다양한 곳에 적용하고 있으므로 
@@ -560,7 +560,7 @@ public class UserDao {
 
 ### 3.6.1 update()
 
----
+
 
 deleteAll()에 먼저 적용해보자.
 
@@ -615,7 +615,7 @@ user.getld(), user.getName(), user.getPassword());
 
 ### 3.6.2 queryForInt()
 
----
+
 
 ```java
 // 직접 만든 PreparedStatementCreator에 JDBCTemplete 적용
@@ -652,7 +652,7 @@ public int getCount() {
 
 ### 3.6.3 queryForObject()
 
----
+
 
 ```java
 // queryForObject: (PreparedStatement를 만들기위한 SQL, SQL에 바인딩할 값, 결과값 매퍼)
@@ -674,7 +674,7 @@ public User get(String id) {
 
 ### 3.6.4 query()
 
----
+
 
 ```java
 // query()의 리턴타입은 List<T>이다. 여러값을 받을 때 사용하면 편리하다.
@@ -694,7 +694,7 @@ public List<User> getAll() {
 
 ### 3.6.5 재사용 가능한 콜백의 분리
 
----
+
 
 ```java
 // setDataSource()로 
@@ -741,7 +741,7 @@ public class UserDao {
 
 ## 3.7 정리
 
----
+
 
 3장에서는 예외처리와 안전한 리소스 반환을 보장해주는 DAO 코드를 만들고
 이를 객체지향 설계 원리와 디자인 패턴 DI 등을 적용해서 깔끔하고 유연하며 단순한 코드로
@@ -749,7 +749,7 @@ public class UserDao {
 
 ### 3장에서 다룬 내용은 다음과 같다.
 
----
+
 
 - JDBC와 같은 예외가 발생할 가능성이 있으며 공유 리소스의 반환이 필요한 코드는
 반드시 try/catch/finally 블록으로 관리해야 한다.

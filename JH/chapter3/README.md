@@ -185,7 +185,7 @@ UserDao의 메소드를 개선하는 작업을 시작해보자
 
 먼저 할일은 성격이 다른 것을 찾아내는 것이다.
 
-![Untitled](3%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%90%E1%85%A6%E1%86%B7%E1%84%91%E1%85%B3%E1%86%AF%E1%84%85%E1%85%B5%E1%86%BA%20f2d03395202c4a538c992d23bb019508/Untitled.png)
+![Untitled](https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter3/image/Untitled.png?raw=true)
 
 쿼리문을 입력하는것을 제외하고서는 나머지는 변하지 않을 것이다.
 
@@ -304,7 +304,7 @@ public class UserDaoDeleteAll extends UserDao {
 
 인터페이스를 통해 위임하는 방식이다.
 
-![Untitled](3%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%90%E1%85%A6%E1%86%B7%E1%84%91%E1%85%B3%E1%86%AF%E1%84%85%E1%85%B5%E1%86%BA%20f2d03395202c4a538c992d23bb019508/Untitled%201.png)
+![Untitled(https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter3/image/Untitled%201.png?raw=true)
 
 좌측에 있는 Context의 contextMethod()에서 일정한 구조를 가지고 동작하다가
 
@@ -403,7 +403,7 @@ public class UserDao {
 
 Clinet가 결정하는게 일반적이다.
 
-![Untitled](3%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%90%E1%85%A6%E1%86%B7%E1%84%91%E1%85%B3%E1%86%AF%E1%84%85%E1%85%B5%E1%86%BA%20f2d03395202c4a538c992d23bb019508/Untitled%202.png)
+![Untitled](https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter3/image/Untitled%202.png?raw=true)
 
 이제 클라이언트가 어떤것을 사용할지 선택하게 만들어 보자
 
@@ -531,7 +531,7 @@ public void add(User user) throws SQLException {
 
 그리고 테스트 코드를 다시한번 돌려보자
 
-![Untitled](3%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%90%E1%85%A6%E1%86%B7%E1%84%91%E1%85%B3%E1%86%AF%E1%84%85%E1%85%B5%E1%86%BA%20f2d03395202c4a538c992d23bb019508/Untitled%203.png)
+![Untitled](https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter3/image/Untitled%203.png?raw=true)
 
 성공 하는 것을 볼 수 있다.
 
@@ -582,7 +582,7 @@ public void add(User user) throws SQLException {
 
 **익명 내부 클래스**
 
-![Untitled](3%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%90%E1%85%A6%E1%86%B7%E1%84%91%E1%85%B3%E1%86%AF%E1%84%85%E1%85%B5%E1%86%BA%20f2d03395202c4a538c992d23bb019508/Untitled%204.png)
+![Untitled](https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter3/image/Untitled%204.png?raw=true)
 
 ```
 public void add(User user) throws SQLException {
@@ -737,7 +737,7 @@ public class UserDao {
 
 템플릿/콜백 패턴 이라고 부른다.
 
-![Untitled](3%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%90%E1%85%A6%E1%86%B7%E1%84%91%E1%85%B3%E1%86%AF%E1%84%85%E1%85%B5%E1%86%BA%20f2d03395202c4a538c992d23bb019508/Untitled%205.png)
+![Untitled](https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter3/image/Untitled%205.png?raw=true)
 
 ### 3.5.1 템플릿/콜백의 동작원리
 
@@ -759,7 +759,7 @@ public class UserDao {
 
 하나의 메소드를 가진 인터페이스를 구현한 익명 내부 클래스로 만들어진다고 보면 된다.
 
-![Untitled](3%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%90%E1%85%A6%E1%86%B7%E1%84%91%E1%85%B3%E1%86%AF%E1%84%85%E1%85%B5%E1%86%BA%20f2d03395202c4a538c992d23bb019508/Untitled%206.png)
+![Untitled](https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter3/image/Untitled%206.png?raw=true)
 
 - 클라이언트 역할은 템플릿 안에서 실행될 로직을 담은 콜백 오브젝트를 만들고, 콜백이 참조할 정보를 제공하는 것이다. 만들어진 콜백은 클라이언트가 템플릿의 메소드를 호출할 때 파라미터로 전달된다.
 - 템플릿은 정해진 작업 흐름을 따라 작업을 진행하다가 내부에서 생성한 참조정보를 가지고 콜백 오브젝트의 메소드를 호출한다. 콜백은 클라이언트 메소드에 있는 정보와 템플릿이 제공한 참조정보를 이용해서 작업을 수행하고 그결과를 다시 템플릿에 돌려준다.
@@ -769,7 +769,7 @@ public class UserDao {
 
 앞에서 만들었떤 UserDao, JdbcContext 와 StatementStrategy의 코드에 적용된 템플릿/콜백 패턴을 살펴보자
 
-![Untitled](3%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%90%E1%85%A6%E1%86%B7%E1%84%91%E1%85%B3%E1%86%AF%E1%84%85%E1%85%B5%E1%86%BA%20f2d03395202c4a538c992d23bb019508/Untitled%207.png)
+![Untitled](https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter3/image/Untitled%207.png?raw=true)
 
 JdbcContext의 workWithStatementStrategy() 템플릿은 리턴 값이 없는 단순한 구조다.
 

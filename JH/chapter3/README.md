@@ -471,7 +471,7 @@ public void deleteAll() throws SQLException {
 
 이번에 add() 메소드에도 적용해보자.
 
-```
+```java
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -493,7 +493,7 @@ public class AddStatement implements StatementStrategy {
 
 AddStatement에 클라이언트로부터 User 타입 오브젝트를 받을 수 있도록 개선해주자.
 
-```
+```java
 import com.example.springtoby.chapter3.User;
 
 import java.sql.Connection;

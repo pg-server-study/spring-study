@@ -303,7 +303,7 @@ public class UserDaoDeleteAll extends UserDao {
 
 인터페이스를 통해 위임하는 방식이다.
 
-![Untitled(https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter3/image/Untitled%201.png?raw=true)
+![Untitled](https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter3/image/Untitled%201.png?raw=true)
 
 좌측에 있는 Context의 contextMethod()에서 일정한 구조를 가지고 동작하다가
 
@@ -317,7 +317,7 @@ JDBC를 이용해 DB를 업데이트하는 변하지 않는 context을 갖는다
 
 - DB 커넥션 가져오기
 - PreparedStatement를 만들어줄 외부 기능 호출하기
-- 전달받은ㄴ PreparedStatement 실행하기
+- 전달받은 PreparedStatement 실행하기
 - 예외가 발생하면 이를 다시 메소드 밖으로 던지기
 - 모든 경우에 만들어진 PreparedStatement 와 Connection을 적절히 닫아 주기
 
@@ -902,7 +902,7 @@ add() 메소드에 대한 편리한 메소드도 제공된다.
 
 치환자를 가진 SQL로 PreparedStatement를 만들고 함께 제공하는 파라미터를 순서대로 바인딩
 
-해주는 기능을가진 update() 메소드를 사용할 수 있따.
+해주는 기능을가진 update() 메소드를 사용할 수 있다.
 
 ```
 public void add(final User user) throws SQLException {

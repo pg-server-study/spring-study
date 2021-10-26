@@ -20,7 +20,7 @@ public void deleteAll() throws SQLException {
 }
 ```
 
-그런데 PreparedStatement를 처리히는 중에 예외가 발생하면 어떻  게 될까? 
+그런데 PreparedStatement를 처리히는 중에 예외가 발생하면 어떻게 될까? 
 
 이때는 메소드 실행을 끝마치지 못하고 바로 메소드를 빠져나가게 된다. 
 
@@ -233,7 +233,7 @@ Client 가 구체적인 전략의 하나를 선택하고 오브젝트로 만들�
 
 결국 이 구조에서 전략 오브젝트 생성과 컨텍스트로의 전달을 담당히는 책임을 분리시킨 것이 바로 ObjectFactory 이며， 이를 일반화한 것이 앞에서 살펴봤던 의존관계 주입이 였다.
 
-> 컨텍스트에 해당하는 부분은 별도의 메소드로 독립시격보자.
+> 컨텍스트에 해당하는 부분은 별도의 메소드로 독립시켜보자.
 
 ```java
 public void jdbcContextWithStatementStrategy(StatementStrategy stmt) throws 
@@ -306,7 +306,7 @@ public void add(User user) throws SQLException {
 }
 ```
 
-지금까지 해옹 작업만으로도 많은 문제점을 해결하고 코드도 깔끔하게 만들긴 했지만， 
+지금까지 해온 작업만으로도 많은 문제점을 해결하고 코드도 깔끔하게 만들긴 했지만， 
 
 먼저 DAO 메소드마다 새로운  StatementStrategy 구현 클래스를 만들어야 한다는 점과
 
@@ -461,14 +461,14 @@ public class UserDao {
 
 새롭게 작성된 오브젝트 간의 의존관계를 살며보고 이를 스프링 설정에 적용해보자. 
 
- 프링의 DI는 기본적으로 인터페이스를 사이에  두고 의존 클래스를 바꿔서 사용하도록 하는 게 목적이다. 하지만 이 경우 JdbcContext  는 그 자체로 독립적인 JDBC 컨텍 트를 제공해주는 서비스 오브젝트로서 의미가 있을 뿐이고 구현 방법이 바뀔 가능성은 없다. 
+ 프링의 DI는 기본적으로 인터페이스를 사이에  두고 의존 클래스를 바꿔서 사용하도록 하는 게 목적이다. 하지만 이 경우 JdbcContext  는 그 자체로 독립적인 JDBC 컨텍스트를 제공해주는 서비스 오브젝트로서 의미가 있을 뿐이고 구현 방법이 바뀔 가능성은 없다. 
 
 따라서 인터페이스를 구현하도록 만들지않았다
 
 인터페이스를 사용해서 클래스를 자유롭게 변경할 수 있게 하지는 않았지만，  JdbcContext를 UserDao와 Di 구조로 만들어야 할 이유를 생각해보자.
 
-- . JdbcContext는 그 자체로 변경되는 상태정보를 갖고 있지 않다.  읽기 전용이므로 싱글톤이 되는데 아무런 문제가 없다 . 
--  JdbcContext 가 Di 를 통해 다른 빈에 의존하고 있기 때문이다. 이 두번째 이유가 중요하다.  JdbcContext는 dataSource 프로퍼 티를 통해 DataSource 오브젝트를  주입받도록 되어있다. DI 를 위해서는 주입되는 오브젝트와 주입받는 오브젝트 양쪽 모  두 스프링 빈으로 등록돼야 한다.
+-  JdbcContext는 그 자체로 변경되는 상태정보를 갖고 있지 않다.  읽기 전용이므로 싱글톤이 되는데 아무런 문제가 없다 . 
+-  JdbcContext 가 DI 를 통해 다른 빈에 의존하고 있기 때문이다. 이 두번째 이유가 중요하다.  JdbcContext는 dataSource 프로퍼티를 통해 DataSource 오브젝트를  주입받도록 되어있다. DI 를 위해서는 주입되는 오브젝트와 주입받는 오브젝트 양쪽 모두 스프링 빈으로 등록돼야 한다.
 
 > tip ) 단，이런 클래스를 바로 사용하는 코드 구성을 DI에 적용히는 것은 가장 마지막 단계  에서 고려해볼 사항임을 잊지 말자.
 
@@ -534,7 +534,7 @@ private void executeSQl(final String Query) throws SQLException {
 
 이렇게 재사용 가능한 콜백을 담고 있는 메소드라면 DAO가 공유할 수 있는 템플릿 클래스 안으로 옮겨도 된다. 
 
-엄밀히 말해서 템플릿은 JdbcContext 클래스가 아니라  workWithStatementStrategy() 메소드이므로 JdbcContext 클래스로 콜백 생성과 댐플  릿 호출이 담긴 executeSql () 메소드를 옮긴다고 해도 문제 될 것은 없다.
+엄밀히 말해서 템플릿은 JdbcContext 클래스가 아니라  workWithStatementStrategy() 메소드이므로 JdbcContext 클래스로 콜백 생성과 템플릿 호출이 담긴 executeSql () 메소드를 옮긴다고 해도 문제 될 것은 없다.
 
 ```java
 public class JdbcContext { 
@@ -558,7 +558,7 @@ public void deleteAll() throws SQLException {
 }
 ```
 
-일반적으로는 성격이 다른 묘드들은 가능한 한 분리하는 편이 낫지만， 이 경우는 반대다. 하나의 목적을 위해 서로 긴밀하게 연관되어 동작하는 웅집력이 강한 코드들이기  때문에 한 군데 모여 있는 게 유리하다.
+일반적으로는 성격이 다른 모듈들은 가능한 한 분리하는 편이 낫지만， 이 경우는 반대다. 하나의 목적을 위해 서로 긴밀하게 연관되어 동작하는 응집력이 강한 코드들이기  때문에 한 군데 모여 있는 게 유리하다.
 
 ### 테스트와 try/catch/finally
 

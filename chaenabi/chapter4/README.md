@@ -45,46 +45,46 @@ Tags: 백엔드 스터디, 예외
     예외의 의미를 조금이라도 더 명확하게 만들어줄 때 사용할 수 있습니다.
     
     
-    ```java
-    // 예시
-    public class SomeClass111 {
-    	public void error(int a) {
-    	     if (a == 0) throw new RuntimeException(); 
+```java
+// 예시
+public class SomeClass111 {
+   public void error(int a) {
+       if (a == 0) throw new RuntimeException(); 
+   }
+}
+
+// SomeClass111처럼 쓰지 말고 아래의 SomeClass222 처럼 사용하면 됩니다.
+
+public class SomeClass222 {
+   public void error(int a) {
+       if (a == 0) throw new AisZeroException(); // <-- 조금더 구체적인 예외로 처리
+   }
+
+   public usetrycatch(int a) throws DuplicateUserldException, SQLException {
+       try { ... }
+       catch (SQLException sqle) {
+	   // if (sqle가 pk 키 중복 때문에 발생한 예외라면)
+	   if (sqle.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
+	       throw DuplicateUserIdException("중복키발생"); // 구체적인 예외로 처리
+	   } else { ... }
     	}
     }
-    
-    // SomeClass111처럼 쓰지 말고 아래의 SomeClass222 처럼 사용하면 됩니다.
-    
-    public class SomeClass222 {
-    	public void error(int a) {
-    	     if (a == 0) throw new AisZeroException(); // <-- 조금더 구체적인 예외로 처리
-    	}
-	
-	public usetrycatch(int a) throws DuplicateUserldException, SQLException {
-	     try { ... }
-	     catch (SQLException sqle) {
-	         // if (sqle가 pk 키 중복 때문에 발생한 예외라면)
-	         if (sqle.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
-		   throw DuplicateUserIdException("중복키발생"); // 구체적인 예외로 처리
-                 } else { ... }
-	     }
-	}
-    }
-    
-    // 구체적인 예외 클래스 생성1
-    public class AisZeroException extends RuntimeException {
-    	public AisZeroException() {
-    	    super("a가 0이어서 예외가 발생했습니다");
-    	}
-    }
-    
-    // 구체적인 예외 클래스 생성2
-    public class DuplicateUserIdException extends SQLException {
-    	public DuplicateUserIdException(String reason) {
-            super(reason);
-        }
-    }
-    ```
+}
+
+// 구체적인 예외 클래스 생성1
+public class AisZeroException extends RuntimeException {
+   public AisZeroException() {
+       super("a가 0이어서 예외가 발생했습니다");
+   }
+}
+
+// 구체적인 예외 클래스 생성2
+public class DuplicateUserIdException extends SQLException {
+   public DuplicateUserIdException(String reason) {
+       super(reason);
+   }
+}
+```
     
 
 
@@ -130,6 +130,7 @@ public useRuntimeException(int a) throws DuplicateUserIdException {
 		throw new RuntimeException(e); // 예외 포장 (sqle를 런타임 예외로 해결하기)
 	    }
 	}
+}
 ```
 
 스프링의 JdbcTemplate은 SQLException을 복구 불가능한 예외라고 판단하였으며, <br>
@@ -153,8 +154,8 @@ public interface UserDao {
 
 public class UserDaoImpl implements UserDao {
     public void add(User user) throws SQLException {
-	try { ... }
-	catch (SQLException e) { ... }
+	 try { ... }
+	 catch (SQLException e) { ... }
     }
 }
 ```
@@ -231,7 +232,7 @@ public class UserDaoJDBCImpl implements UserDao {
      public void add(User user) { // JDBCTemplate을 사용하는 add 메서드 구현
 	String sql = "insert into user values(1, ?)";
 	template.update(sql, user.getName()); // 예외가 발생하면
-		// DataAccessException이 처리하므로 throws 구문이 필요하지 않습니다.
+			// DataAccessException이 처리하므로 throws 구문이 필요하지 않습니다.
     }
 }
 ```

@@ -226,7 +226,7 @@ public void deleteAll() throws SQLException {
 }
 ```
 
-1. 변하지 않는 부분의 공통적인 부분 (이것을 컨텍스트라고 부른다.) 이해하기 
+2. 변하지 않는 부분의 공통적인 부분 (이것을 컨텍스트라고 부른다.) 이해하기 
     - DB 커넥션 가져오기
     - **PreparedStatement를 만들어줄 외부 기능 호출하기**
     (이부분이 변하는 부분이지만, 항상 공통적인 부분에 속한다는 점에서는
@@ -235,7 +235,7 @@ public void deleteAll() throws SQLException {
     - 예외가 발생하면 이를 다시 메소드 밖으로 던지기
     - 모든 경우에 만들어진 PreparedStatement와 Connection을 적절히 닫아주기
 
-1. 개선 (전략패턴 적용)
+3. 개선 (전략패턴 적용)
 
 ```java
 // 전략패턴 인터페이스

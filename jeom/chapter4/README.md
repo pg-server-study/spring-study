@@ -6,7 +6,7 @@
 
 3장에서 JdbcContext로 만들었던 코드를 스프링의 JdbcTemplate을 적용하도록 바꾸면서 설명하지 않고 넘어간 부분이 있다. JdbcTemplate으로 바꾸기 전과 후의 deleteAll() 메소드를 비교해보고 무엇이 달라졌는지 찾아보자.
 
-```
+```java
 //JdbcTemplate 적용전
 public void deleteAll() throws SQLException {
 	this.jdbcContext.excuteSql("delete from users");
@@ -25,7 +25,7 @@ JdbcTemplate 적용 이전에는 있었던 throws SQLException 선언이 적용 
 
 > 예외를 잡고는 아무것도 하지않는코드
 
-```
+```java
 try {
 	//내용생략
 }catch(SQLExcepiton e){
@@ -36,7 +36,7 @@ try {
 
 > 예외가 잡고 메세지만 남기는 예외처리
 
-```
+```java
 }catch(SQLExcepiton e){
 	System.out.println(e);
 }
@@ -53,7 +53,7 @@ try {
 
 > 무의미하고 무책임한 throws
 
-```
+```java
 public void method1() throws Exception{
 	method2();
 	//생략
@@ -68,3 +68,58 @@ public void method3() throws Exception{
 자신이 사용하려고 하는 메소드에 throws Exception이 선언되어 있다고 가정할 경우 , 그런 메소드 선언에서는 의미 있는 정보를 얻을수 없다. 정말 무엇인가 실행중에 예외적인 상황이 발생 할수 있다는 것인지 아니면 그냥 습관적으로 복사해서 붙여 놓은건지 알수가 없다.
 
 결국 이런메소드를 사용하는 메소드에서도 역시 throws Exception을 따라서 붙이는 수 밖에 없다.**결과적으로 적절한 처리를 통해 복구 될수 있는 예외상황도 제대로 다룰수 있는 기회를 박탈당한다.**
+
+## 4.1.2 예외의 종류와 특징
+
+예외는 주로 자바에서 제공하는 java.lang.Exception 클래스와 Exception클래스의 서브 클래스들이 쓰이는 상황을 말한다.
+
+예외는 체크예외와 언체크 예외 두가지로 나눌수 있는데. 언체크 예외는 RuntimeException 을 상속한것들을 말하고 , 체크예외는 이외의 예외들을 말한다.
+
+**체크 예외**
+
+RuntimeException을 상속하지 않는 예외들 . 체크 예외가 발생할수 있는 메소드를 사용할 경우 , 복구 가능한 예외들이기 때문에 반드시 예외를 처리하는 코드를 작성해야한다 . 이를 작성하지 않을시 컴파일 에러가 발생한다.
+
+> ex ) IOException , SQLException 등
+
+**언체크 예외**
+
+RuntimeException을 상속한 예외들. 명시적으로 예외처리를 강제하지 않는다. 피할수 있지만 개발자가 부주의 해서 발생할 수 있는 경우에 발생하도록 만든것이다. 따라서 예상하지 못했던 예외 상황에서 발생하는게 아니기 때문에 꼭 catch나 throws를 사용하지 않아도 된다.
+
+> ex) NullPointerException , IllegalArgumentException 등
+
+### 4.1.3 예외처리 방법
+
+첫번째 예외 처리 방법은 예외 상황을 파악하고 문제를 해결해서 정상 상태로 돌려놓는 것이다.
+
+> 재시도를 통해 예외를 복구하는 코드 
+
+```java
+	int maxrettry = MXA_RETRY;
+    
+    while(maxretry --> 0){
+        try {
+            ... //예외가 발생이 가능성이 있는코드
+            return;	//작업성공 
+        }catch (SomeException e){
+            //로그 출력 . 정해진 시간만큼 대기
+        }finally {
+            //리소스 반납. 정리작업
+        }
+    }
+    throw new RetryFailedException();
+```
+
+두번째 방법은 예외처리를 자신이 담당하지 않고 자신을 호출한 쪽으로 던져버리는 것이다.
+
+> 예외처리 회피
+
+```java
+public void add() throws SQLException {
+	//JDBC API
+}
+```
+
+SQLException을 자신이 처리하지 않고 템플릿으로 던져버린다. ( 위에 설명 했던 무책임한 예외처리 코드 )
+
+마지막으로 예외를 처리하는 방법은 예외 전환을 하는것이다.
+

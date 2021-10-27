@@ -61,13 +61,13 @@ Tags: 백엔드 스터디, 예외
     	}
     
 	public usetrycatch(int a) throws DuplicateUserldException, SQLException {
-	   try { ... }
-	   catch (SQLException sqle) {
-	      // if (sqle가 pk 키 중복 때문에 발생한 예외라면)
-	      if (sqle.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
-		throw DuplicateUserIdException("중복키발생"); // 구체적인 예외로 처리
-              } else { ... }
-	   }
+	     try { ... }
+	     catch (SQLException sqle) {
+	         // if (sqle가 pk 키 중복 때문에 발생한 예외라면)
+	         if (sqle.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
+		   throw DuplicateUserIdException("중복키발생"); // 구체적인 예외로 처리
+                 } else { ... }
+	     }
 	}
     }
     

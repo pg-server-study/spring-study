@@ -10,23 +10,23 @@ Tags: 백엔드 스터디, 예외
 ---
 
 자바에서 throw를 통해 발생시킬 수 있는 예외 세 가지
-
+<br>
 
 1. **`java.lang.Error` (JDK에서 기본 제공하는 예외 클래스)**
     
     OutOfMemoryError, TheadDeath 등의 시스템 레벨 차원의 예외처리 시 사용합니다.
-    
+    <br>
     
 2. **`java.lang.Exception` (JDK에서 기본 제공하는 예외 클래스)**
-    
+    <br>
     애플리케이션 코드의 작업 중에 발생할 수 있는 예외를 처리할 때 사용합니다. <br>
     java.lang.Exception은 아래와 같이 두 가지 예외로 구분됩니다.
-    
+    <br>
     - **checked exception (컴파일 시간에 체킹이 가능한 예외들)**
         - java.lang.Exception을 상속받고 있으나 RuntimeException과는 관련이 없는 경우. <br>
         (IOException, SQLException 등이 이 경우에 속합니다.)
         예외처리를 하지 않으면 컴파일 에러가 발생합니다.
-        
+   <br>
     - **unchecked exception (런타임에만 체킹이 가능한 예외들)**
         - java.lang.Exception을 상속받는 RuntimeException 및 RuntimeException 하위의 Exception들.
         (NullPointerException, IllegalArgumentException 등이 이 곳에 속합니다.) <br>
@@ -34,16 +34,16 @@ Tags: 백엔드 스터디, 예외
         (단 런타임에 에러가 발생할 수 있습니다.)
         
     
-    
+    <br>
     ![Untitled](4장_asset/Untitled.png)
     
-    
+    <br>
 3. **예외 전환 (exception translation) (java.lang.Error 또는 java.lang.Exception을 응용하는 경우)**
     
-    
+    <br>
     예외의 의미를 조금이라도 더 명확하게 만들어줄 때 사용할 수 있습니다.
     
-    
+    <br>
     ```java
     // 예시
     public class SomeClass111 {
@@ -87,15 +87,15 @@ Tags: 백엔드 스터디, 예외
     
 
 
-
+<br><br>
 ### 예외처리에 대한 올바른 대처
 
 ---
-
+<br>
 - **check exception(컴파일 예외)을 계속 throws를 사용해 넘기는 것은 무의미하며, <br>
 아무런 장점이 없습니다.**
 
-
+<br>
 어짜피 복구가 불가능한 컴파일 예외라면 런타임 예외로 포장해서 <br>
 불필요한 throws 선언이 들어가지 않도록 해주는 것이 좋습니다. (불필요한 코드 줄이기)
 

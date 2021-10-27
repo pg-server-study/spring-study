@@ -147,7 +147,7 @@ RuntimeException을 상속한 예외클래스로 전환하여 처리합니다. <
 ```java
 public interface UserDao {
 		public void add(User user); // 에러!
-																// SQLException가 컴파일에 예외처리를 했는지 체크하기 떄문
+			           // SQLException가 컴파일에 예외처리를 했는지 체크하기 떄문
 		public void add(User user) throws SQLException; // 에러가 발생하지는 않지만...
 }
 
@@ -204,12 +204,12 @@ public class UserDaoJPAImpl implements UserDao {
 
 ```java
 public interface UserDao {
-		public void add(User user) throws Exception; // 최상위 java.lang.Exception으로
-																								 // 선언하면 모두 대응가능하긴 하지만...
+	public void add(User user) throws Exception; // 최상위 java.lang.Exception으로
+	// 선언하면 모두 대응가능하긴 하지만...
 }
 
 public class UserDaoJPAImpl implements UserDao {
-   public void add(User user) throws Exception {} //불필요한 throws Exception 선언 요구됨
+	public void add(User user) throws Exception {} //불필요한 throws Exception 선언 요구됨
 					    	 //Database와 관련되지 않은, 예상치 못한 예외까지 처리되는 문제도 있음
 }
 ```
@@ -231,7 +231,7 @@ public class UserDaoJDBCImpl implements UserDao {
 	 public void add(User user) { // JDBCTemplate을 사용하는 add 메서드 구현
 			String sql = "insert into user values(1, ?)";
 			template.update(sql, user.getName()); // 예외가 발생하면
-												// DataAccessException이 처리하므로 throws 구문이 필요없습니다.
+			        // DataAccessException이 처리하므로 throws 구문이 필요없습니다.
 	 }
 }
 ```

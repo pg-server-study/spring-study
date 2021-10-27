@@ -231,7 +231,7 @@ public class UserDaoJDBCImpl implements UserDao {
      public void add(User user) { // JDBCTemplate을 사용하는 add 메서드 구현
 	String sql = "insert into user values(1, ?)";
 	template.update(sql, user.getName()); // 예외가 발생하면
-		// DataAccessException이 처리하므로 throws 구문이 필요없습니다.
+		// DataAccessException이 처리하므로 throws 구문이 필요하지 않습니다.
     }
 }
 ```

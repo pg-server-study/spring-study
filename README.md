@@ -40,3 +40,14 @@
 | minnim6   | [2장 - 테스트](https://github.com/pg-server-study/spring-study/tree/main/jeom/chapter2)|
 | chaenabi   | [2장 - 테스트](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter2)                                                             |
 
+### Chapter3
+
+**템플릿**
+
+| 닉네임    | 정리                                                         |
+| --------- | ------------------------------------------------------------ |
+| BEST      | [@pursue503](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter3) |
+| pursue503 | [3장 - 템플릿](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter3)|
+| minnim6   | [3장 - 템플릿](https://github.com/pg-server-study/spring-study/tree/main/jeom/chapter3)|
+| chaenabi   | [3장 - 템플릿](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter3)     
+

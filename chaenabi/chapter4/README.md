@@ -59,7 +59,7 @@ Tags: 백엔드 스터디, 예외
     	public void error(int a) {
     	     if (a == 0) throw new AisZeroException(); // <-- 조금더 구체적인 예외로 처리
     	}
-    
+	
 	public usetrycatch(int a) throws DuplicateUserldException, SQLException {
 	     try { ... }
 	     catch (SQLException sqle) {

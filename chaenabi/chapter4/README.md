@@ -48,41 +48,41 @@ Tags: 백엔드 스터디, 예외
 ```java
 // 예시
 public class SomeClass111 {
-   public void error(int a) {
-       if (a == 0) throw new RuntimeException(); 
-   }
+     public void error(int a) {
+          if (a == 0) throw new RuntimeException(); 
+     }
 }
 
 // SomeClass111처럼 쓰지 말고 아래의 SomeClass222 처럼 사용하면 됩니다.
 
 public class SomeClass222 {
    public void error(int a) {
-       if (a == 0) throw new AisZeroException(); // <-- 조금더 구체적인 예외로 처리
+        if (a == 0) throw new AisZeroException(); // <-- 조금더 구체적인 예외로 처리
    }
 
    public usetrycatch(int a) throws DuplicateUserldException, SQLException {
-       try { ... }
-       catch (SQLException sqle) {
-	   // if (sqle가 pk 키 중복 때문에 발생한 예외라면)
-	   if (sqle.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
-	       throw DuplicateUserIdException("중복키발생"); // 구체적인 예외로 처리
-	   } else { ... }
+        try { ... }
+        catch (SQLException sqle) {
+	     // if (sqle가 pk 키 중복 때문에 발생한 예외라면)
+	     if (sqle.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
+	          throw DuplicateUserIdException("중복키발생"); // 구체적인 예외로 처리
+	    } else { ... }
     	}
     }
 }
 
 // 구체적인 예외 클래스 생성1
 public class AisZeroException extends RuntimeException {
-   public AisZeroException() {
-       super("a가 0이어서 예외가 발생했습니다");
-   }
+     public AisZeroException() {
+          super("a가 0이어서 예외가 발생했습니다");
+     }
 }
 
 // 구체적인 예외 클래스 생성2
 public class DuplicateUserIdException extends SQLException {
-   public DuplicateUserIdException(String reason) {
-       super(reason);
-   }
+     public DuplicateUserIdException(String reason) {
+          super(reason);
+     }
 }
 ```
     
@@ -113,23 +113,23 @@ public class DuplicateUserIdException extends SQLException {
 ```java
 // 런타임용 클래스 선언
 public class DuplicateUserldException extends RuntimeException { 
-      public DuplicateUserldException(Throwable cause) { 
-           super(cause);
-      }
+     public DuplicateUserldException(Throwable cause) { 
+          super(cause);
+     }
 }
 
 //DuplicateUserldException 사용하기
 //메서드에서 throws SQLException을 제거하고 DuplicateUserIdException만 선언해도 됩니다.
 public useRuntimeException(int a) throws DuplicateUserIdException { 
-	try { ... }
-	catch (SQLException sqle) {
-	    // if (sqle가 pk 키 중복 때문에 발생한 예외라면)
-	    if (sqle.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
-	         throw DuplicateUserIdException(sqle); // 구체적인 예외로 처리 (예외 전환)
-	    } else { 
-		throw new RuntimeException(e); // 예외 포장 (sqle를 런타임 예외로 해결하기)
-	    }
-	}
+     try { ... }
+     catch (SQLException sqle) {
+          // if (sqle가 pk 키 중복 때문에 발생한 예외라면)
+          if (sqle.getErrorCode() == MysqlErrorNumbers.ER_DUP_ENTRY) {
+	       throw DuplicateUserIdException(sqle); // 구체적인 예외로 처리 (예외 전환)
+	  } else { 
+               throw new RuntimeException(e); // 예외 포장 (sqle를 런타임 예외로 해결하기)
+	  }
+     }
 }
 ```
 
@@ -147,16 +147,16 @@ RuntimeException을 상속한 예외클래스로 전환하여 처리합니다. <
 
 ```java
 public interface UserDao {
-    public void add(User user); // 에러!
+     public void add(User user); // 에러!
 		   // SQLException가 컴파일에 예외처리를 했는지 체크하기 떄문
-    public void add(User user) throws SQLException; // 에러가 발생하지는 않지만...
+     public void add(User user) throws SQLException; // 에러가 발생하지는 않지만...
 }
 
 public class UserDaoImpl implements UserDao {
-    public void add(User user) throws SQLException {
+     public void add(User user) throws SQLException {
 	 try { ... }
 	 catch (SQLException e) { ... }
-    }
+     }
 }
 ```
 
@@ -205,12 +205,12 @@ public class UserDaoJPAImpl implements UserDao {
 
 ```java
 public interface UserDao {
-	public void add(User user) throws Exception; // 최상위 java.lang.Exception으로
-	// 선언하면 모두 대응가능하긴 하지만...
+     public void add(User user) throws Exception; // 최상위 java.lang.Exception으로
+     // 선언하면 모두 대응가능하긴 하지만...
 }
 
 public class UserDaoJPAImpl implements UserDao {
-	public void add(User user) throws Exception {} //불필요한 throws Exception 선언 요구됨
+     public void add(User user) throws Exception {} //불필요한 throws Exception 선언 요구됨
 					   //Database와 관련되지 않은, 예상치 못한 예외까지 처리되는 문제도 있음
 }
 ```

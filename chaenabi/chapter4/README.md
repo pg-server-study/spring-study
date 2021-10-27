@@ -11,32 +11,38 @@ Tags: 백엔드 스터디, 예외
 
 자바에서 throw를 통해 발생시킬 수 있는 예외 세 가지
 
+
 1. **`java.lang.Error` (JDK에서 기본 제공하는 예외 클래스)**
     
     OutOfMemoryError, TheadDeath 등의 시스템 레벨 차원의 예외처리 시 사용합니다.
     
+    
 2. **`java.lang.Exception` (JDK에서 기본 제공하는 예외 클래스)**
     
-    애플리케이션 코드의 작업 중에 발생할 수 있는 예외를 처리할 때 사용합니다.
+    애플리케이션 코드의 작업 중에 발생할 수 있는 예외를 처리할 때 사용합니다. <br>
     java.lang.Exception은 아래와 같이 두 가지 예외로 구분됩니다.
     
     - **checked exception (컴파일 시간에 체킹이 가능한 예외들)**
-        - java.lang.Exception을 상속받고 있으나 RuntimeException과는 관련이 없는 경우.
+        - java.lang.Exception을 상속받고 있으나 RuntimeException과는 관련이 없는 경우. <br>
         (IOException, SQLException 등이 이 경우에 속합니다.)
         예외처리를 하지 않으면 컴파일 에러가 발생합니다.
         
     - **unchecked exception (런타임에만 체킹이 가능한 예외들)**
         - java.lang.Exception을 상속받는 RuntimeException 및 RuntimeException 하위의 Exception들.
-        (NullPointerException, IllegalArgumentException 등이 이 곳에 속합니다.)
+        (NullPointerException, IllegalArgumentException 등이 이 곳에 속합니다.) <br>
         예외처리가 필수는 아니므로 예외처리하지 않아도 컴파일 시 에러가 발생하지 않습니다.
         (단 런타임에 에러가 발생할 수 있습니다.)
         
     
+    
     ![Untitled](4장_asset/Untitled.png)
+    
     
 3. **예외 전환 (exception translation) (java.lang.Error 또는 java.lang.Exception을 응용하는 경우)**
     
+    
     예외의 의미를 조금이라도 더 명확하게 만들어줄 때 사용할 수 있습니다.
+    
     
     ```java
     // 예시
@@ -80,24 +86,28 @@ Tags: 백엔드 스터디, 예외
     ```
     
 
+
+
 ### 예외처리에 대한 올바른 대처
 
 ---
 
-- **check exception(컴파일 예외)을 계속 throws를 사용해 넘기는 것은 무의미하며,
+- **check exception(컴파일 예외)을 계속 throws를 사용해 넘기는 것은 무의미하며, <br>
 아무런 장점이 없습니다.**
 
-어짜피 복구가 불가능한 컴파일 예외라면 런타임 예외로 포장해서
+
+어짜피 복구가 불가능한 컴파일 예외라면 런타임 예외로 포장해서 <br>
 불필요한 throws 선언이 들어가지 않도록 해주는 것이 좋습니다. (불필요한 코드 줄이기)
 
-예를들어 java.lang.SQLException은 대부분 복구가 불가능한 예외이므로
+예를들어 java.lang.SQLException은 대부분 복구가 불가능한 예외이므로 <br>
 이 예외를 처리해도 대응이 가능한 경우가 거의 없습니다.
 
-즉 SQLException은 throws를 타고 계속 상위 예외로 전달되다가
-마지막에 애플리케이션 밖으로 던져지기만 (log에 기록된다던지) 할 것입니다.
+즉 SQLException은 throws를 타고 계속 상위 예외로 전달되다가 <br>
+마지막에 애플리케이션 밖으로 던져지기만 (log에 기록된다던지) 할 것입니다. 
 
-아래의 코드는 SQLException을 RuntimeException으로 바꾸고
+아래의 코드는 SQLException을 RuntimeException으로 바꾸고 <br>
 개발자에게 의미있는 정보를 전달하도록 만든 코드입니다.
+
 
 ```java
 // 런타임용 클래스 선언
@@ -121,16 +131,17 @@ public useRuntimeException(int a) throws DuplicateUserIdException {
 		}
 ```
 
-스프링의 JdbcTemplate은 SQLException을 복구 불가능한 예외라고 판단하였으며,
+스프링의 JdbcTemplate은 SQLException을 복구 불가능한 예외라고 판단하였으며, <br>
 
-따라서 SQLException이 발생할 경우 **`DataAccessException`**이라는
-RuntimeException을 상속한 예외클래스로 전환하여 처리합니다.
+따라서 SQLException이 발생할 경우 **`DataAccessException`**이라는 <br>
+RuntimeException을 상속한 예외클래스로 전환하여 처리합니다. <br>
 
-사실 스프링의 API 메소드에 있는 대부분의 예외는 RuntimeException을 상속한 클래스들입니다.
+사실 스프링의 API 메소드에 있는 대부분의 예외는 RuntimeException을 상속한 클래스들입니다. <br>
 
 ## DataAccessException
 
 ---
+
 
 ```java
 public interface UserDao {
@@ -165,6 +176,7 @@ public void add(User user) throws JdoException; // JDO
 
 다시 말해 아래와 같은 문제가 발생합니다.
 
+
 ```java
 
 public interface UserDao {
@@ -183,9 +195,11 @@ public class UserDaoJPAImpl implements UserDao {
 }
 ```
 
-혹시`**PersistentException**`, `**HibernateException**`, `**JdoException`** 들은 Exception을 상속할테니
+`**PersistentException**`, `**HibernateException**`, `**JdoException`** 들은 Exception을 상속할테니 <br>
+
 
 아래처럼 선언하면 어떨까요?
+
 
 ```java
 public interface UserDao {
@@ -199,11 +213,13 @@ public class UserDaoJPAImpl implements UserDao {
 }
 ```
 
-물론 JPA, Hibernate 등은 내부적으로 RuntimeException 예외처리를 하기 떄문에
+
+물론 JPA, Hibernate 등은 내부적으로 RuntimeException 예외처리를 하기 떄문에<br>
 throws 구문 선언이 필요없습니다.
 
-마찬가지로 DataAccessException도 RuntimeException 예외처리이므로
+마찬가지로 DataAccessException도 RuntimeException 예외처리이므로 <br>
 throws 선언없이 아래처럼 사용할 수 있습니다.
+
 
 ```java
 public interface UserDao {

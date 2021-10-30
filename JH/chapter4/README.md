@@ -10,7 +10,7 @@
 
 3장에서 달라진 deleteAll()
 
-```
+```java
 // 변경전
 public void deleteAll() throws SQLException {
 	this.jdbcContext.executeSql("delete from users");
@@ -30,7 +30,7 @@ JdbcTemplate를 사용한뒤 SQLException 이 사라졌다.
 
 만드는 사람들이 많이 저지르는 악습니다.
 
-```
+```java
 // 1번
 try {
 
@@ -64,7 +64,7 @@ try {
 
 **무의미하고 무책임한 throws**
 
-```
+```java
 public void method1() throws Exception {
 	method2();
 }
@@ -126,7 +126,7 @@ RuntimeException 을 상속받는 주요 에러들
 
 첫번쨰로는 MAX_RETRY 만큼 재시도를 하는거다
 
-```
+```java
 
 int maxRetry = MAX_RETRY;
 
@@ -142,7 +142,7 @@ throw new RetryFailedException(); // 예외발생
 
 두번쨰 방법은 throws 문으로 선언해서 발생하면 던지는거다.
 
-```
+```java
 public void add() throws SQLException {
 		// JDBC API
 }
@@ -152,7 +152,7 @@ public void add() throws SQLException {
 
 의미있는 예외를 던져 왜 에러가 발생했는지 알기 쉽게 한다.
 
-```
+```java
 public void add(User user) throws DuplicateUserIdException, SQLException {
 		try {
 				// JDBC...
@@ -188,7 +188,7 @@ public class DuplicateUserIdException extends RuntimeException {
 
 이제 add() 메소드를 수정하자.
 
-```
+```java
 public void add(final User user) throws DuplicateUserIdException {
      try {
          this.jdbcTemplate.update("insert into users(id, name, password) values(?,?,?)", user.getId(), user.getName(), user.getPassword());

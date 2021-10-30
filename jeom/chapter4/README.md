@@ -376,3 +376,60 @@ public class UserDaoTst{
 ```
 
 일단 UserDao테스트는 DAO의 기능을 검증하는것이 목적이지 jDBC를 이용한 구현에 관심이 있는것이 아니다 . 그러니 UserDao라는 변수 타입을 그대로 두고 스프링 빈을 인터페이스로 가져 오도록 만드는 편이 낫다.
+
+```java
+@Test(expected=DataAccessExcetion.class)
+public void duplciateKey(){
+	dao.deleteAll();
+	
+	dao.add(user1);
+	dao.add(user1); //예외발생 
+}
+```
+
+테스트가 성공 할경우 DataAccessExcetion 타입의 예외가 던져졌음이 분명하다. DataAccessExcetion의 서브 클래스 일수도 있으므로 구체적으로 어떤 예외인지 확인해 볼 필요가있다. 이번엔 expected=DataAccessExcetion.class 부분을 빼고 테스트를 실행해보자.
+
+테스트는 실패 했지만 DataAccessExcetion 의 서브 클래스인 DuplicteKeyException이 발생한것을 확인 할수있다.
+
+### DataAccessExcetion 활용시 주의사항
+
+안타깝게 DuplicteKeyException은 아직 까지는 Jdbc를 이용하는 경우에만 발생한다. 데이터 액세스 기술을 하이버네이트나 jpa를 사용했을때도 동일한 예외가 발생 할것으로 기대하지만 실제로 다른 예외가 던져진다.
+
+그이유는 SQLException에 담긴 DB에러 코드를 바로 해석하는 JDBC의 경우와달리 JPA나 하이버네이트등에서는 각 기술이 재정의한 예외를 가져와 **스프링이 최종적으로 DataAccessExcetion 으로 변환하는데 , DB의 에러 코드와 달리 이런 예외들은 세분화되어 있지 않기 때문이다.**
+
+기술에 상관없이 어느정도 추상화된 공통 예외로 변환해주긴하지만 근본적인 한계 때문에 완벽하다고 기대할 수는 없다. 따라서 사용에 주의를 기울여야한다.
+
+DataAccessExcetion을 잡아서 처리하는 코드를 만들려고 한다면 미리 학습테스트를 만들어서 실제로 전환되는 예외의 종류들을 확인해둘필요가있다.
+
+```java
+public class UserDaoTest{
+	@Autowried UserDao dao;
+	@Autowride DataSource dataSource;
+}
+```
+
+> DataSource를 사용해 SQLException에서 직접 DuplicteKeyException으로 전환하는 기능을 확인해보는 학습테스트
+
+```java
+@Test
+public void sqlExceptionTranslate(){
+	dao.deleteAll();
+	try{
+		dao.add(user1);
+		dao.add(user1);
+	}catch(DuplicateKeyException ex){
+		SQLException sqlEx = (SQLException)ex.getRootCause();
+		SQLExceptionTranslator set = //코드를 이용한 SQLException의 전환
+			new SQLErrorCodeSQLExceptionTranslator(this.dataSource);
+		assertThat(set.thanslate(null,null,sqlEx)),
+			is(DuplicateKeyException.class));
+	}
+}
+```
+
+강제로 DuplicateKeyException을 발생시킨다 . DuplicateKeyException은 중첩된 예외 이므로 JBDC API에서 처음 발생한 SQLException을 갖고 있다 .getRootCause을 이용하면 중첩되어있는 SQLException을 가져올수 있다.
+
+이제 검증해 볼 사항은 스프링의 예외 전환 API를 직접 적용해서 DuplicateKeyException 이 만들어 지는가이다.
+
+주입받은 dataSource를 이용해서 SQLErrorCodeSQLExceptionTranslator의 오브젝트를 만든다. 그리고 SQLException을 파라미터로 넣어 translate()메소드를 호출해주면 DataAccessException 타입의 예외로 변환해준다 . **변환된 DataAccessException타입의 예외가 정확히 DuplicateKeyException타입인지를 확인하면된다.**
+

@@ -57,7 +57,7 @@
 
 | 닉네임    | 정리                                                         |
 | --------- | ------------------------------------------------------------ |
-| BEST      | [@]() |
+| BEST      | [@minnim6](https://github.com/pg-server-study/spring-study/tree/main/jeom/chapter4) |
 | pursue503 | [4장 - 예외](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter4)|
 | minnim6   | [4장 - 예외](https://github.com/pg-server-study/spring-study/tree/main/jeom/chapter4)|
 | chaenabi   | [4장 - 예외](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter4)     

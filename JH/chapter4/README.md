@@ -28,7 +28,7 @@ JdbcTemplate를 사용한뒤 SQLException 이 사라졌다.
 
 예외 블랙홀 자바의 기초를 배운학생들이나 귀찮다고 대충
 
-만드는 사람들이 많이 저지르는 많습니다.
+만드는 사람들이 많이 저지르는 악습입니다.
 
 ```
 // 1번
@@ -46,7 +46,7 @@ try {
 	System.out.println(e);
 }
 
-//3버ㅏㄴ
+//3번
 try {
 
 } catch (SQLException e ) {
@@ -208,9 +208,9 @@ public void add(final User user) throws DuplicateUserIdException {
 
 ### 4.1.5 SQLException은 어떻게 됐나?
 
-지금까지 다룬 예외처리에 대한 애용중 SQLException 선언이 사라졌을것이다.
+지금까지 다룬 예외처리에 대한 내용중 SQLException 선언이 사라졌을것이다.
 
-먼저 생각해볼것이 있따 SQLException은 과연 복구가 가능한 예외인가?
+먼저 생각해볼것이 있다 SQLException은 과연 복구가 가능한 예외인가?
 
 99%는 복구가 불가능하다. 통제할 수 없는 외부상황 떄문에 발생한다
 

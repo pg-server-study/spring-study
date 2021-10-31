@@ -43,6 +43,8 @@ public enum Level {
 }
 ```
 
+위의 User와 Level을 사용하는 코드
+
 ```java
 
 public void insertUser() {
@@ -57,7 +59,7 @@ public void insertUser() {
 }
 
 public class UserDao {
-	 @Autowired
+   @Autowired
    private final JdbcTemplate jdbcTemplate;
 
    public void add(User user) {

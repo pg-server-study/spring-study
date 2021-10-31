@@ -16,7 +16,7 @@ public class User {
    private final String id;
    private final String name;
    private final Level level; // User 클래스에 Level 데이터 추가.
-          // level을 String으로 관리해도 되지만 Enumerate 타입으로 관리하면 장점이 많다.
+              // level을 String으로 관리해도 되지만 Enumerate 타입으로 관리하면 장점이 많다.
 }
 
 public enum Level {
@@ -46,10 +46,11 @@ public enum Level {
 ```java
 
 public void insertUser() {
-	 UserDao dao = new UserDao();
-	 dao.add(new User("gyumee", "박성철", Level.BASIC));
-	 dao.add(new User("leegw700", "이길원", Level.SILVER));
-	 dao.add(new User("bumjin", "박범진", Level.GOLD));
+   UserDao dao = new UserDao();
+   dao.add(new User("gyumee", "박성철", Level.BASIC));
+   dao.add(new User("leegw700", "이길원", Level.SILVER));
+   dao.add(new User("bumjin", "박범진", Level.GOLD));
+   
    // enum을 사용하면 level 컬럼에 제한된 값만 넣을 수 있으며,
    // 오타가 발생할 수 있는 문자열에 비해 enum 타입은
    // 명확한 값으로 전달할 수 있기 떄문에 편리하다.
@@ -103,26 +104,26 @@ public class UserDao {
 
 ```java
 public class UserDao {
-	 @Autowired
+   @Autowired
    private final JdbcTemplate jdbcTemplate;
 
    // Connection을 생성할 때 사용할 Database source를 DI받도록 한다.
-	 @Autowired
-	 private final DataSource datasource; 
+   @Autowired
+   private final DataSource datasource; 
 
    public void upgradeLevel(User user) {
-			// 트랜잭션 동기화 관리자를 이용해 동기화 작업을 초기화한다.
+      // 트랜잭션 동기화 관리자를 이용해 동기화 작업을 초기화한다.
       TransactionSynchronizationManager.initSynchronization();
-	 	  // DB 커넥션을 생성하고 트랜잭션을 시작시킨다. 
+      // DB 커넥션을 생성하고 트랜잭션을 시작시킨다. 
       Connection c = DataSourceUtils.getConnection(this.dataSource);
       c.setAutoCommit(false); // update sql이 실행될때마다 자동 commit 되는 것을 비활성화.
-		  try {
-			  List<User> users = getAll();
+      try {
+        List<User> users = getAll();
         for (User user : users) {
             this.jdbcTemplate.update("update user set level = ? where id = ?",
                            Level.upgradeLevel(user.getLevel()), user.getId());
         }
-		  } catch (RuntimeException e) {
+      } catch (RuntimeException e) {
          c.rollback(); // 예외가 발생하면 해당 트랜잭션을 모두 롤백시켜 모든 작업을 
                        // 일괄 취소시켜, 모든 데이터를 작업 전으로 되돌린다.
          throw e;
@@ -135,16 +136,16 @@ public class UserDao {
    }
 
    public List<User> getAll() {
-		  return this.jdbcTemplate.query("select * from users order by id",
-			  new RowMapper<User>() {
-				   public User mapRow(ResultSet rs, int rowNum) throws SQLException { 
-					 		 User user = new User(); 
-							 user.setId(rs.getString("id")); 
-							 user.setName(rs.getString("name")); 
-							 user.setLevel(Level.valueOf(rs.getString("level")));
-						   return user;
-					 }
-		  	});
+       return this.jdbcTemplate.query("select * from users order by id",
+           new RowMapper<User>() {
+	      public User mapRow(ResultSet rs, int rowNum) throws SQLException { 
+	         User user = new User(); 
+                 user.setId(rs.getString("id")); 
+                 user.setName(rs.getString("name")); 
+                 user.setLevel(Level.valueOf(rs.getString("level")));
+                 return user;
+             }
+	  });
     }
 }
 ```

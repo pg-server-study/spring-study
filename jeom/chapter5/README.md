@@ -352,3 +352,129 @@ private void checkLevel(User user,Level expectedLevel){
 }
 ```
 
+### 5.1.4 UserService.add()
+
+사용자 관리 비즈니스 로직에서 대부분은 구현 했지만 처음 가입하는 사용자는 기본적으로 BASIC 레벨이여야한다는 부분을 구현하지 않았다 .
+
+UserService 에 add()를 만들어두고 사용자가 등록 될때 적용할만한 비즈니스 로직을 담당하게한다.
+
+```java
+@Test
+public void add(){
+	userDao.deleteAll();
+	
+	User userWithLevel = users.get(4); //이미 레벨이 gold일 경우 레벨을 초기화 하지 않는다.
+	User userWithoutLevel = users.get(0); // 레벨이 비어있는 사용자 
+	userWithoutLevel.setLevel(null);
+	
+	userService.add(userWithLevel);
+	userService.add(userWithoutLevel);
+	
+	User userWithLevelRead = userDao.get(userWhitLevel.getId());
+	User userWihtoutLevelRead = userDao.get(userWithoutLevel.getId());
+    //DB에 저장된 결과를 가져와 확인
+	
+	assertThat(userWithLevelRead.getLevel(),is(userWithLevel.getLevel()));
+	assertThat(userWithoutLevelRead.getLevel(), is(Level.BASIC));
+}
+```
+
+> 사용자 신규 등록 로직을 담은 add() 메소드
+
+```java
+public void add(User user){
+	if(user.getLevel() == null) user.setLevel(Level.BASIC);
+	userDao.add(user);
+} 
+```
+
+### upgradeLevels() 리팩토링
+
+> 읽기 불편했던 for 속에 if / else if / else 문들을 분리해 기본작업 흐름만 남겨두었다.
+
+```java
+public void upgradeLevels(){
+	List<User> users = userDao.getAll();
+	for(User user: users){
+		if(canUpgrandeLevel(user)){
+			upgradeLevel(user);
+		}
+	}
+}
+```
+
+```java
+private boolean canUparadeLevel(User user){
+	Level currentLevel = user.getLevel();
+	switch(currentLevel){
+		case BASIC: return (user.getLogin()>=50); //레벨별로 구분해서 조건을 판단
+		case SILVER: return (user.getRecommend()>=30);
+		case GOLD: return false;
+		default: throw new IllegalArgumentException("Unknown Level:" + currentLevel);
+        //다룰수 없는 레벨이 주어지면 레벨 발생
+	}
+}
+```
+
+```java
+private void upgradeLevel(User user){
+	if(user.getLevel() == Level.BASIC) user.setLevel(Level.SILVER);
+	else if(user.getLevel() == Level.SILVER) user.setLevel(Level.GOLD);
+	userDao.update(user);
+}
+```
+
+다음레벨이 무엇인가하는 로직과 오브젝트의 level 필드를 변경해 준다는 로직이 함께 있는데다 , 너무 노골적으로 드러나 있다 . 게다가 예외 상황에 대한처리가 없다. 더군다나 레벨이 늘어난다면 if 문이 점점 길어질 것이다.
+
+```java
+public enum Level{
+	GOLD(3,null), SILVER(2,GOLD),BASIC(1,SILVER);
+	//이넘 선언에 DB에 저장할 값과 함께 다음 단계의 레벨정보도 추가한다.
+	private final int value;
+	private final Level next; //다음 단계의 레벨 정보를 스스로 갖고 있도록 추가
+	
+	Level(int vlaue,Level next){
+		this.value = value;
+		this.next = next;
+	}
+	
+	public int intValue(){
+		return value;
+	}
+	
+	public Level nextLevel(){
+		return this.next;
+	}
+	
+	public static Level vlaueOf(int value){
+		switch(value){
+			case 1: return BASIC;
+			case 2: return SLCVER;
+			case 3: retrun GOLD;
+			default: throws new AssertionError("Unknown vlaue:"+value);
+		}
+	}
+}
+```
+
+```java
+public void upgradeLevel(){
+	Level nextLevel = this.level.nextLevel();
+	if(nextLevel == null){
+		throws new IllegalStateException(this.level+"은 업그레이드가 불가능합니다.")
+	}
+	else{
+		this.level = nextLevel;
+	}
+}
+```
+
+> 간결해진  UserService 의 upgradeLevel
+
+```java
+private void upgradeLevel(User user){
+	user.upgradeLevel();
+	userDao.update(user);
+}
+```
+

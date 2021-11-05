@@ -514,6 +514,65 @@ public class UserTest{
 
 ## 트랜잭션 서비스 추상화
 
+중간에 예외가 발생해서 작업이 중단된다면 어떻게 될까? 이미 변경된 사용자의레벨은 작업 이전 상태로 돌아갈까 ? 아니면 바뀐채로 남아있을까 ? 
+
+테스트를 위한 가장 쉬운 방법은 예외를 강제로 발생 시키도록 애플리케이션 코드를 수정하는 것이다 . 하지만 테스트를 위해 코드를 함부러 건드리는 것은 좋은 생각이아니다.
+
+> 먼저 테스트용으로 UserService 를 상속한 클래스를 하나 만든다 . UserService 메소드의 대부분은 현재 privete 접근제한이 걸려있어 오버라이딩이 불가능 하다 . 테스트 코드는 테스트 대상 클래스의 내부의 구현내용을 고려해서 밀접하게 접근해야 하는데 privete 처럼 제약이 강한 사용자를 사용하면 불편하다. 
+>
+> 테스트를 위해 애플리케이션 코드를 직접 수정하는 일은 가능한 피하는 것이 좋지만 이번에는 예외로 해야할것같다.
+>
+> 먼저 UserService 의 upgradeLevel() 메소드의 접근 권한을 다음과같이 수정하자 `protected void upgradeLevel(User user)` 이제 UserService 를 상속해서 UserService 대역을 맡을 클래스를  UserService Test에 추가한다.
+
+```java
+static class TestUserService extends UserService{
+	private String id;
+	
+	private TestUserService(String id){ //예외를 발생시킬 user 오브젝트의 ID를 지정할수있게함
+		this.id = id;
+	}
+	
+	protected void upgradeLevel(User user){ //UserService 메소드를 오버라이드
+		if(user.getId().equals(this.id))throws new TestServiceEcxeption();
+        // 지정된 id의 User 오브젝트가 발견되면 예외를 던져서 작업중단시킴
+		super.upgradeLevel(user);
+	}
+} 
+```
+
+### 강제 예외 발생을 통한 테스트
+
+```java
+@Test
+public void upgradeAllOrNothing(){
+	UserService testUserService = new TestService(users.get(3).getId());
+    //예외를 발생시킬 네번째 사용자 id를 넣어서 테스트용 userservice 오브젝트 생성 
+	testUserService.setUserDao(this.userDao); //수동 DI
+	userDao.deldetAll();
+	for(Uesr user : usres) userDao.add(user);
+	
+	try{ //예외가 발생하지 않는다면 실패 
+		testUserService.upgradeLevels();
+		fail("TestUserServiceException expected");
+	}catch(TestUserServiceException e){	 //예외를 잡아서 계속 진행되도록 한다 . 
+	}
+	checkLevelUpgraded(user.get(1),false);
+    //예외가 발생하기 전에 레벨 변경이 있었던 사용자의 레벨이 처음상태로 바뀌었나 확인.
+}
+```
+
+우리가 기대 하는건 네번째 사용자를 처리하다가 예외가 발생해서 작업이 중단되었으니 **이미 레벨을 수정했던 두번째 사용자도 원래 상태로 돌아가는 것이다.** 하지만 위 테스트는 실패한다.
+
+### 테스트 실패의 원인 
+
+**바로 트랜잭션 문제다.** 모든 사용자의 레벨을 업그레이드 하는 작업인 upgraedeLevel() 메소드가 하나의 트랜잭션 안에서 동작하지 않았기 때문이다 . 
+
+**트랜잭션이란 더 이상 나눌수 없는 단위 작업을 만한다. 작업을 쪼개서 작은 단위로 만들수 없다는 것은 트랜잭션의 핵심 속성인 원자성을 의미한다.**
+
+모든 사용자에 대한 레벨 업그레이드 작업은 새로 추가된 기술 요구사항대로 전체가 다 성공하던지 아니면 전체가 다 실패하던지 해야한다 . 레벨 업그레이드 작업은 그 작업을 쪼개서 부분적으로는 성공하기도 하고, 여러번에 걸쳐서 진생할수 있는 작업이 아니여야한다. 
+
+**작업을 완료할수 없다면 아예 작업이 시작되지 않은것 처럼 초기 상태로 돌려놔야 한다. 이것이 바로 트랜잭션이다.**
+
 
 
 

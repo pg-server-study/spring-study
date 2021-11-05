@@ -478,3 +478,43 @@ private void upgradeLevel(User user){
 }
 ```
 
+### User 테스트
+
+```java
+public class UserTest{
+	User user;
+	
+	@Before
+	public void setUp(){
+		user = new User();
+	}
+	
+	@Test()
+	public void upgradeLevel(){
+		Level[] levels = Level.values();
+		for(Level level : levels){
+			if(level.nextLevel() == null) continue;
+			user.setLevel(level);
+			user.upgradeLevel();
+			assertThat(user.getLevel(),is(level.nextLevel()));
+		}
+	}
+	
+	@Test(expected = IloegalStateException.class)
+	public void cannotUpgradeLevel(){
+		Level[] levels = Level.vlaues();
+		for(Level level:levels){
+			if(level.nextLevel()!=null) continue;
+			user.setLevel(level);
+			user.uparadeLevel();
+		}
+	}
+}
+```
+
+## 트랜잭션 서비스 추상화
+
+
+
+
+

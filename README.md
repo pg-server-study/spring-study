@@ -24,7 +24,7 @@
 
 |닉네임| 정리
 | ---- | --- |
-| BEST | [@chaenabi](https://near-sunscreen-c35.notion.site/2-b28a6b1bf46b4523959dc86cb5aa111e)
+| BEST | [@chaenabi](https://reminiscent-headlight-ee3.notion.site/4-1a42c978e0af4509a679bd713fb13175)
 | pursue503 | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter1)
 | minnim6 | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/blob/main/jeom/README.md.md)
 | chaenabi | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter1)
@@ -49,5 +49,16 @@
 | BEST      | [@pursue503](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter3) |
 | pursue503 | [3장 - 템플릿](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter3)|
 | minnim6   | [3장 - 템플릿](https://github.com/pg-server-study/spring-study/tree/main/jeom/chapter3)|
-| chaenabi   | [3장 - 템플릿](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter3)     
+| chaenabi   | [3장 - 템플릿](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter3)
+
+### Chapter4
+
+**예외**
+
+| 닉네임    | 정리                                                         |
+| --------- | ------------------------------------------------------------ |
+| BEST      | [@minnim6](https://github.com/pg-server-study/spring-study/tree/main/jeom/chapter4) |
+| pursue503 | [4장 - 예외](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter4)|
+| minnim6   | [4장 - 예외](https://github.com/pg-server-study/spring-study/tree/main/jeom/chapter4)|
+| chaenabi   | [4장 - 예외](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter4)     
 

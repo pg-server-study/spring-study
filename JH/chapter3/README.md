@@ -447,7 +447,7 @@ public class UserDao {
 }
 ```
 
-이제 클라이언트에게 PreparedStatement를 선택하게 만들었으니 클라이언트르 ㄹ봐보자
+이제 클라이언트에게 PreparedStatement를 선택하게 만들었으니 클라이언트를 봐보자
 
 ```
 public void deleteAll() throws SQLException {

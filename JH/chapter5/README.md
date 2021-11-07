@@ -1,3 +1,6 @@
+[노션을 참고하면 더욱 좋습니다.](https://near-sunscreen-c35.notion.site/5-ab0217bf0b7b4caf8fd196efacbaab3b)
+
+
 # 5장 서비스 추상화
 
 5장에서는 지금까지 만든 DAO에 트랜잭션을 적용해보면서 스프링이 어떻게 성격이
@@ -6,7 +9,7 @@
 
 살펴본다.
 
----
+
 
 ## 5.1 사용자 레벨 관리 기능 추가
 
@@ -478,16 +481,16 @@ class UserDao {
 ![Untitled](5%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%89%E1%85%A5%E1%84%87%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%8E%E1%85%AE%E1%84%89%E1%85%A1%E1%86%BC%E1%84%92%E1%85%AA%20fa1ce9a7f9fc451c806e596a21fe6c37/Untitled.png)
 
 ```java
-2021-11-07 17:22:02.120 DEBUG 3847 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:119)
+2021-11-07 17:22:02.120 DEBUG 3847  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:119)
 1. delete from users
 
-2021-11-07 17:22:02.128 DEBUG 3847 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 17:22:02.128 DEBUG 3847  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. insert into users(id, name, password, level, login, recommend) values('gyumee','박성철','springno1',1,1,0)
 
-2021-11-07 17:22:02.130 DEBUG 3847 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 17:22:02.130 DEBUG 3847  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. update users set name = '오민규', password = 'springno6', level =3, login = 1000, recommend = 999 where id = 'gyumee'
 
-2021-11-07 17:22:02.133 DEBUG 3847 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
+2021-11-07 17:22:02.133 DEBUG 3847  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
 1. select * from users where id = 'gyumee'
 ```
 
@@ -738,49 +741,49 @@ public class UserServiceTest {
 테스트를 돌려보면
 
 ```java
-2021-11-07 17:51:42.595 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:119)
+2021-11-07 17:51:42.595 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:119)
 1. delete from users
 
-2021-11-07 17:51:42.603 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 17:51:42.603 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. insert into users(id, name, password, level, login, recommend) values('bumjin','박범진','p1',1,49,0)
 
-2021-11-07 17:51:42.604 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 17:51:42.604 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. insert into users(id, name, password, level, login, recommend) values('joytouch','강명성','p2',1,50,0)
 
-2021-11-07 17:51:42.605 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 17:51:42.605 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. insert into users(id, name, password, level, login, recommend) values('erwins','신승한','p3',2,60,29)
 
-2021-11-07 17:51:42.605 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 17:51:42.605 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. insert into users(id, name, password, level, login, recommend) values('madnite1','이상호','p4',2,60,30)
 
-2021-11-07 17:51:42.606 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 17:51:42.606 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. insert into users(id, name, password, level, login, recommend) values('green','오민규','p5',3,100,100)
 
-2021-11-07 17:51:42.606 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyStatement.executeQuery(ProxyStatement.java:110)
+2021-11-07 17:51:42.606 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyStatement.executeQuery(ProxyStatement.java:110)
 1. select * from users order by id
 
-2021-11-07 17:51:42.616 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 17:51:42.616 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. update users set name = '오민규', password = 'p5', level =3, login = 100, recommend = 100 where id = 'green'
 
-2021-11-07 17:51:42.617 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 17:51:42.617 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. update users set name = '강명성', password = 'p2', level =2, login = 50, recommend = 0 where id = 'joytouch'
 
-2021-11-07 17:51:42.617 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 17:51:42.617 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. update users set name = '이상호', password = 'p4', level =3, login = 60, recommend = 30 where id = 'madnite1'
 
-2021-11-07 17:51:42.618 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
+2021-11-07 17:51:42.618 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
 1. select * from users where id = 'bumjin'
 
-2021-11-07 17:51:42.648 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
+2021-11-07 17:51:42.648 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
 1. select * from users where id = 'joytouch'
 
-2021-11-07 17:51:42.649 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
+2021-11-07 17:51:42.649 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
 1. select * from users where id = 'erwins'
 
-2021-11-07 17:51:42.649 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
+2021-11-07 17:51:42.649 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
 1. select * from users where id = 'madnite1'
 
-2021-11-07 17:51:42.649 DEBUG 4019 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
+2021-11-07 17:51:42.649 DEBUG 4019  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
 1. select * from users where id = 'green'
 ```
 
@@ -889,19 +892,19 @@ UserService 테스트도 구현되었다 테스트를 실행해보자.
 해당 코드도 통과한다!
 
 ```java
-2021-11-07 18:00:10.632 DEBUG 4062 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:119)
+2021-11-07 18:00:10.632 DEBUG 4062  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:119)
 1. delete from users
 
-2021-11-07 18:00:10.642 DEBUG 4062 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 18:00:10.642 DEBUG 4062  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. insert into users(id, name, password, level, login, recommend) values('green','오민규','p5',3,100,100)
 
-2021-11-07 18:00:10.644 DEBUG 4062 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
+2021-11-07 18:00:10.644 DEBUG 4062  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeUpdate(ProxyPreparedStatement.java:61)
 1. insert into users(id, name, password, level, login, recommend) values('bumjin','박범진','p1',1,49,0)
 
-2021-11-07 18:00:10.648 DEBUG 4062 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
+2021-11-07 18:00:10.648 DEBUG 4062  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
 1. select * from users where id = 'green'
 
-2021-11-07 18:00:10.654 DEBUG 4062 --- [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
+2021-11-07 18:00:10.654 DEBUG 4062  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyPreparedStatement.executeQuery(ProxyPreparedStatement.java:52)
 1. select * from users where id = 'bumjin'
 ```
 
@@ -1256,7 +1259,7 @@ class UserServiceTest {
 
 이러면 테스트 코드는 서비스의 바껴도 같이 수정해줄 번거로움이 사라진다.
 
----
+
 
 ## 5.2 트랜잭션 서비스 추상화
 
@@ -1656,7 +1659,7 @@ public class UserServiceTest {
 
 ![Untitled](5%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%89%E1%85%A5%E1%84%87%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%8E%E1%85%AE%E1%84%89%E1%85%A1%E1%86%BC%E1%84%92%E1%85%AA%20fa1ce9a7f9fc451c806e596a21fe6c37/Untitled%201.png)
 
----
+
 
 ## 5.5 정리
 

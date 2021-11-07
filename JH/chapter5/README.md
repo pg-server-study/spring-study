@@ -478,7 +478,7 @@ class UserDao {
 }
 ```
 
-![Untitled](5%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%89%E1%85%A5%E1%84%87%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%8E%E1%85%AE%E1%84%89%E1%85%A1%E1%86%BC%E1%84%92%E1%85%AA%20fa1ce9a7f9fc451c806e596a21fe6c37/Untitled.png)
+![Untitled](https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter5/image/Untitled.png?raw=true)
 
 ```java
 2021-11-07 17:22:02.120 DEBUG 3847  [           main] jdbc.sqlonly                             :  com.zaxxer.hikari.pool.ProxyStatement.executeUpdate(ProxyStatement.java:119)
@@ -1657,7 +1657,7 @@ public class UserServiceTest {
 
 트랜잭션 매니저를 넣고 이제 테스트를 돌려보자..!
 
-![Untitled](5%E1%84%8C%E1%85%A1%E1%86%BC%20%E1%84%89%E1%85%A5%E1%84%87%E1%85%B5%E1%84%89%E1%85%B3%20%E1%84%8E%E1%85%AE%E1%84%89%E1%85%A1%E1%86%BC%E1%84%92%E1%85%AA%20fa1ce9a7f9fc451c806e596a21fe6c37/Untitled%201.png)
+![Untitled](https://github.com/pg-server-study/spring-study/blob/JH/JH/chapter5/image/Untitled%201.png?raw=true)
 
 
 

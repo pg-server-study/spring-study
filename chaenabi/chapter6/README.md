@@ -1549,7 +1549,41 @@ AspectAdvice    : [트랜잭션 커밋] void OrderService.orderItem(String)
 AspectAdvice    : [리소스 릴리즈] void OrderService.orderItem(String)
 ```
 
-마지막으로  AOP를 사용해
+스프링이 실제 객체 대신 프록시 객체를 스프링빈으로 등록하는 방법은 아래와 비슷하다.
+
+```java
+@Slf4j
+@RequiredArgsConstructor
+// BeanPostProcessor는 빈후처리기로 객체를 스프링빈으로 등록하기 전에 중간에 가로채어
+// 조작을 가할 수 있다. 스프링은 빈후처리기를 사용해 실제 객체 대신 프록시 객체를 스프링빈으로 등록한다.
+public class PackageLogTracePostProcessor implements BeanPostProcessor {
+
+    private final String basePackage;
+    private final Advisor advisor;
+
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        log.info("param beanName={} bean={}", beanName, bean.getClass());
+
+        // 프록시 적용 대상 여부 체크
+        // 프록시 적용대상이 아니면 원본을 그대로 빈으로 등록
+        String packageName = bean.getClass().getPackageName();
+        if (!packageName.startsWith(basePackage)) {
+            return bean;
+        }
+
+        // 프록시 대상이면 프록시를 만들어서 반환
+        ProxyFactory proxyFactory = new ProxyFactory(bean);
+        proxyFactory.addAdvisor(advisor);
+
+        log.info("create proxy: target={} proxy={}", bean.getClass(), proxyFactory.getProxy().getClass());
+
+        return proxyFactory.getProxy();
+    }
+}
+```
+
+마지막으로 AOP를 사용해
 
 5번 중 1번 실패하는 어떤 로직이 있을 떄 기본 3번까지는 재시도하도록 구현해보도록 하자.
 
@@ -1707,4 +1741,238 @@ RetryAspect : [retry] try count=1/4
 TraceAspect : [trace] String ExamRepository.save(String) args=[data5]
 ......
 
+```
+
+번외:
+
+`CGLIB 프록시`
+
+스프링은 `기본적으로` 다이내믹 프록시 방식을 사용해 프록시 객체를 생성한다.
+
+다이내믹 프록시의 단점은 반드시 인터페이스가 있어야만 프록시 객체를 생성할 수 있다는 것이다.
+
+인터페이스가 존재하지 않는 컴포넌트를 사용해 프록시를 만들려면 어떻게 해야할까?
+
+스프링은 CGLIB 라이브러리를 차용하여 이를 해결한다. 
+
+CGLIB는 실제 객체를 상속받는 프록시 객체를 만들어 반환한다.
+
+구현 코드는 다음과 같다.
+
+```java
+import org.springframework.cglib.proxy.MethodInterceptor;
+import org.springframework.cglib.proxy.MethodProxy;
+
+import java.lang.reflect.Method;
+
+@Slf4j
+@RequiredArgsConstructor
+// MethodInterceptor는 포인트컷이 활성화된 어떤 클래스의 메서드가 실행될 때 aop를 수행한다.
+public class TimeMethodInterceptor implements MethodInterceptor {
+
+    private final Object target;
+
+    @Override
+    public Object intercept(Object obj, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
+        log.info("TimeProxy 실행");
+
+        long startTime = System.currentTimeMillis();
+
+        Object result = methodProxy.invoke(target, args); // 실제로직
+
+        long endTime = System.currentTimeMillis();
+        long resultTime = endTime - startTime;
+
+        log.info("TimeProxy 종료 resultTime={}", resultTime);
+
+        return result;
+    }
+}
+```
+
+사용코드는 다음과 같다.
+
+```java
+import org.springframework.cglib.proxy.Enhancer;
+
+@Slf4j
+public class CglibTest {
+
+    @Test
+    void cglib() {
+        ConcreteService target = new ConcreteService();
+        Enhancer enhancer = new Enhancer(); // cglib 에 target 을 부여하기 위해 사용한다.
+        enhancer.setSuperclass(ConcreteService.class); // 프록시 객체가 상속받을 실제 객체를 설정한다.
+        enhancer.setCallback(new TimeMethodInterceptor(target));
+        ConcreteService proxy = (ConcreteService) enhancer.create();// 프록시 생성
+        log.info("targetClass={}", target.getClass());
+        log.info("proxyClass={}", proxy.getClass());
+    }
+}
+```
+
+스프링은
+
+- 인터페이스가 존재하는 클래스의 경우 dynamic proxy 방식으로 프록시 객체를 생성한다.
+- 인터페이스가 존재하지 않는 클래스의 경우 cglib 방식으로 프록시 객체를 생성한다.
+
+cglib와 dynamic proxy, 각각의 방식으로 생성된 프록시 객체는 어떤 차이점이 있을까?
+
+코드를 통해 알아보자.
+
+```java
+package com.example.CglibVSJdkProxy;
+
+import com.example.MemberService; // 인터페이스
+import com.example.MemberServiceImpl; // 구현체 클래스
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Test;
+import org.springframework.aop.framework.ProxyFactory;
+import org.springframework.objenesis.SpringObjenesis;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+// difference between cglib and jdk proxy
+
+@Slf4j
+public class ProxyCastingTest {
+
+    @Test
+    void jdkProxy() {
+        MemberServiceImpl target = new MemberServiceImpl();
+        ProxyFactory proxyFactory = new ProxyFactory(target);
+
+		// JDK 동적 프록시 사용 하도록 설정 (기본값: false)
+        proxyFactory.setProxyTargetClass(false); 
+
+        // 프록시를 인터페이스로 캐스팅 시도: 성공:
+        // JDK 동적 프록시는 인터페이스 기반으로 생성되기 때문에 인터페이스가 존재하는 경우
+		// 프록시 객체라 해도 캐스팅할 수 있다.
+        MemberService jdkProxy = (MemberService) proxyFactory.getProxy();
+
+        log.info("jdkProxy class={}", jdkProxy.getClass());
+
+        // 프록시를 구체 클래스로 캐스팅 시도: 실패(에러): ClassCastException
+        // 프록시 객체는 MemberService 인터페이스를 따로 구현한 클래스이므로
+		// MemberServiceImpl 과는 어떤 상관관계도 없다. 따라서 (당연히) 실패.
+        assertThatThrownBy(() -> { MemberServiceImpl castingMemberService = (MemberServiceImpl) jdkProxy; })
+                .isInstanceOf(ClassCastException.class)
+                .hasMessageContaining("cannot be cast");
+    }
+
+    @Test
+    void cglibProxy() {
+        MemberServiceImpl target = new MemberServiceImpl();
+        ProxyFactory proxyFactory = new ProxyFactory(target);
+		// CGLIB 프록시 사용하도록 설정 (true)
+        proxyFactory.setProxyTargetClass(true); 
+
+        // 프록시를 인터페이스로 캐스팅 시도: 성공:
+        // CGLIB 는 MemberServiceImpl 을 상속받은 객체를 프록시로 만들기 때문에,
+        // MemberServiceImpl 이 (MemberService 를 구현하고 있으므로)
+		// (당연히) MemberService 인터페이스로도 캐스팅이 성공한다.
+        MemberService cglibProxy = (MemberService) proxyFactory.getProxy();
+
+        log.info("cglibProxy class={}", cglibProxy.getClass());
+
+        // 프록시를 구체 클래스로 캐스팅 시도: 성공
+        // 위에서도 언급했듯 CGLIB 는 MemberServiceImpl 을 상속받은 객체를
+		//프록시로 만들기 때문에 구체클래스로도 캐스팅 가능.
+        MemberServiceImpl castingMemberService = (MemberServiceImpl) cglibProxy;
+    }
+
+    // 여기까지만 보면 cglib 가 장점이 더 많은 것 같아보인다. 그러나 cglib 도 단점이 존재한다.
+    // (실제로, 인터페이스 기반의 프록시 생성--
+	// 즉 jdk proxy 방식의 프록시 생성 방식--이 DI 관점에서 더 옳다는 점도 고려해야 한다.)
+    
+	// cglib의 단점은 간략하게 아래와 같이 기술하겠다.
+
+    // CGLIB 구체 클래스 기반 프록시 문제점:
+    // 1. 타겟클래스(구체부모클래스)에서 기본 생성자 제공이 필수적이다.
+    // 예시 코드는 아래와 같다.
+
+    /*
+    public class 구체부모클래스 {
+        private String 어떤필드변수;
+
+        public 구체부모클래스() {}
+        public 구체부모클래스(String 어떤필드변수) {
+            this.어떤필드변수 = 어떤필드변수;
+        }
+    }
+
+    public class CGLIB_프록시클래스 extends 구체부모클래스 {
+        CGLIB_프록시클래스() {
+            super(); // 기본 생성자 호출함
+        }
+    }
+    */
+
+    // 2. 생성자 두번 호출 문제 (구체 클래스를 상속받아서 만들어지는 프록시 객체이므로,
+	// 프록시의 생성자 호출시 부모 클래스의 생성자 또한 호출되어야 한다.
+
+    // 예시 코드는 아래와 같다.
+    /*
+    public class 구체부모클래스 {
+        private String 어떤필드변수;
+
+        구체부모클래스(String 어떤필드변수) {
+            this.어떤필드변수 = 어떤필드변수;
+        }
+    }
+
+    public class CGLIB_프록시클래스 extends 구체부모클래스 {
+
+        private String 어떤필드변수;
+        private String 어쩌구;
+
+        CGLIB_프록시클래스(String 어떤필드변수, String 어쩌구) {
+            super(어떤필드변수); // CGLIB 프록시 클래스 생성자 안에서 구체부모클래스의
+                               // 생성자가 반드시 먼저 호출되어야 한다는 제약이 있다.
+            this.어떤필드변수 = 어떤필드변수;
+            this.어쩌구 = 어쩌구;
+        }
+    }
+    // 2번의 문제는 스프링이 Objenesis라는 라이브러리를 사용하여 해결했다.
+    // 사용 코드는 아래에 있다.
+    */
+
+    // 3. 타겟 클래스(구체부모클래스)는 final 키워드 적용이 불가능하다.
+}
+```
+
+일반적으로는 부모의 생성자 호출 없는 자식 클래스를 만드는 것이 불가능하다.
+
+아래의 CGLIB_프록시클래스는 보통 자바 문법으로는 생성 불가능하다.
+
+```java
+@RequiredArgsConstructor
+public class 구체부모클래스 {
+    private final String 어떤필드변수;
+}
+
+public class CGLIB_프록시클래스 extends 구체부모클래스 {
+
+    private String 어떤필드변수;
+    private String 어쩌구;
+
+    CGLIB_프록시클래스(String 어떤필드변수, String 어쩌구) {
+        super(); // 에러 발생. CGLIB_프록시클래스 생성 불가
+        this.어떤필드변수 = 어떤필드변수;
+        this.어쩌구 = 어쩌구;
+    }
+}
+```
+
+Objenesis 는 부모의 생성자 호출 없이도 자식클래스를 생성하는 것이 가능하다.
+
+```java
+// 스프링이 cglib를 사용 할때 생성자 두번 호출되는 문제를 해결하는 방식
+@Test
+void test() {
+    SpringObjenesis objenesis = new SpringObjenesis();
+	// 기본생성자 없이도 초기화가 된다.
+    CGLIB_프록시클래스 프록시 = (CGLIB_프록시클래스) objenesis.newInstance(부모클래스.class); 
+    log.info("부모클래스.어떤필드변수의 값: {}", 프록시.어떤필드변수); // 이상없음
+}
 ```

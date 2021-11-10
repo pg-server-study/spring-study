@@ -1306,7 +1306,7 @@ public class SpringAopApplication {
 
 첫번째 방법의 경우, 개발자가 starter-aop 라이브러리를 프로젝트에 추가할 때 
 
-스프링부트가 자동으로 @EnableAspectJAutoProxy 기능을 수행해주기 떄문에 명시적으로 작성할 필요조차 없다. 
+스프링부트가 자동으로 @EnableAspectJAutoProxy 기능을 수행해주기 때문에 명시적으로 작성할 필요조차 없다. 
 
 한번 설정하고 나면 아래의 방법 등으로 사용하면 되는데, 
 
@@ -1584,7 +1584,7 @@ public class PackageLogTracePostProcessor implements BeanPostProcessor {
 
 마지막으로 AOP를 사용해
 
-5번 중 1번 실패하는 어떤 로직이 있을 떄 기본 3번까지는 재시도하도록 구현해보도록 하자.
+5번 중 1번 실패하는 어떤 로직이 있을 때 기본 3번까지는 재시도하도록 구현해보도록 하자.
 
 ```java
 @Repository
@@ -1759,6 +1759,17 @@ CGLIB는 실제 객체를 상속받는 프록시 객체를 만들어 반환한�
 구현 코드는 다음과 같다.
 
 ```java
+// 인터페이스가 존재하지 않는 어떤 클래스. 이 클래스를 사용해 프록시를 만들 것이다.
+@Slf4j
+public class ConcreteService {
+    public void call() {
+        log.info("ConcreteService 호출");
+    }
+}
+```
+
+```java
+// 프록시 로직을 수행하는 어드바이스 클래스를 작성한다.
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
 

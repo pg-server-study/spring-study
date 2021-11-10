@@ -259,7 +259,7 @@ public class ProxyPatternClient {
 public class ProxyPatternTest {
 
     @Test
-	  @DisplayName("프록시 객체 없이 사용했을 때")
+	@DisplayName("프록시 객체 없이 사용했을 때")
     void noProxyTest() { 
         RealSubject realSubject = new RealSubject();
         ProxyPatternClient proxyPatternClient = new ProxyPatternClient(**realSubject**);
@@ -273,7 +273,7 @@ public class ProxyPatternTest {
     }
     
     @Test
-		@DisplayName("프록시 객체가 있을 때")
+	@DisplayName("프록시 객체가 있을 때")
     void cacheProxyTest() {
         RealSubject realSubject = new RealSubject();
         CacheProxy cacheProxy = new CacheProxy(realSubject);
@@ -386,7 +386,7 @@ public class DecoratorPatternClient {
 @Slf4j
 public class DecoratorPatternTest {
 
-	@Test
+    @Test
     @DisplayName("TimeDecorator 없이 사용")
     void noDecorator() {
         RealComponent realComponent = new RealComponent();
@@ -488,17 +488,17 @@ public class ReflectionTest {
 
     @Test
     void reflection() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-      
-		// 런타임에 (동적으로) 어떤 메소드를 사용할지 문자열로 전달가능
+        
+        // 런타임에 (동적으로) 어떤 메소드를 사용할지 문자열로 전달가능
         // 다만 메서드가 존재하지 않으면 런타임시간에 에러 발생
-		// (컴파일시간에 문제를 찾을 수 없음)
+        // (컴파일시간에 문제를 찾을 수 없음)
         Class<?> classHello = Class.forName("com.example.ReflectionTest$실제객체");
         실제객체 target = new 실제객체();
         dynamicCall(classHello.getMethod("callA"), target); // 프록시 적용
         dynamicCall(classHello.getMethod("callB"), target); // 프록시 적용
     }
 
-	// 로그를 기록하는 공통 프록시 메서드. 프록시를 여러개 만들 필요가 없다.
+    // 로그를 기록하는 공통 프록시 메서드. 프록시를 여러개 만들 필요가 없다.
     // 위에서도 언급했듯 로그를 기록하는 프록시를 사용할 곳을 동적으로 설정할 수 있다. 
     private void dynamicCall(Method method, Object target) throws InvocationTargetException, IllegalAccessException {
         log.info("start"); // 로그 기록
@@ -659,7 +659,7 @@ public class JDkDynamicProxyTest {
         log.info("proxyClass={}", proxy.getClass());
     }
     /*
-	    dynamicB() 결과
+        dynamicB() 결과
         16:51:13.193 com.example.TimeInvocationHandler - TimeProxy 실행
         16:51:13.193 com.example.BImpl - B 호출
         16:51:13.193 com.example.TimeInvocationHandler - TimeProxy 종료 resultTime=0
@@ -922,8 +922,7 @@ public class AopMethodTest {
 
     @Test
     void isAopExactMatch() {
-      pointcut.setExpression(
-			 "execution(public java.lang.String com.example.MemberServiceImpl.hello(String))");
+      pointcut.setExpression("execution(public java.lang.String com.example.MemberServiceImpl.hello(String))");
       assertThat(pointcut.matches(helloMethod, MemberServiceImpl.class)).isTrue();
     }
 

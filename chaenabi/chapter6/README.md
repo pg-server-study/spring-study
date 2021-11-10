@@ -753,7 +753,7 @@ public class AdvisorTest {
 		DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(
                                         new APointcut(), // 특정 조건을 만족했을때만 프록시가 동작하도록 설정
                                         new TimeAdvice()
-									);
+					);
 
 		proxyFactory.addAdvisor(advisor);
 			
@@ -837,22 +837,19 @@ advice, advisor, advice 이해를 돕기 위한 그림. advisor가 등록된 상
 void advisorTest2() {
     ServiceImpl target = new ServiceImpl();
     ProxyFactory proxyFactory = new ProxyFactory(target);
-	/* 
+	/*
 	// 기존 방식
-	DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(
-							    new APointcut(), 
-								new TimeAdvice()
-						);
+	DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(new APointcut(), new TimeAdvice());
 	*/
 
 	// 포인트컷을 생성하는 다른 방법
-	**AspectJExpressionPointcut aspectJPointcut = new AspectJExpressionPointcut();**
+    **AspectJExpressionPointcut aspectJPointcut = new AspectJExpressionPointcut();**
 	**aspectJPointcut.setExpression("execution(* *..save*(..))");**
 
     DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(
                                 **aspectJPointcut**, // aspectJ 방식으로 설정된 Pointcut를 advisor에 등록
                                 new TimeAdvice()
-		                );
+		            );
 
 	proxyFactory.addAdvisor(advisor);
 		

@@ -290,15 +290,15 @@ public class ProxyPatternTest {
         log.info("세번째 호출");
         client.execute();
 
-			  // cacheProxyTest() 수행결과
-			  // 15:42:24.353 [main] INFO - 최초 호출
-		  	// 15:42:24.355 [main] INFO - 프록시 호출
-		  	// 15:42:24.355 [main] INFO - 실제 객체 호출
-			  // 15:42:25.364 [main] INFO - 두번째 호출
-			  // `두번째` 호출부터 캐싱되어 실제 객체를 호출하지 않는다.
-			  // 15:42:25.364 [main] INFO - 프록시 호출
-			  // 15:42:25.364 [main] INFO - 세번째 호출
-			  // 15:42:25.364 [main] INFO - 프록시 호출
+        // cacheProxyTest() 수행결과
+        // 15:42:24.353 [main] INFO - 최초 호출
+        // 15:42:24.355 [main] INFO - 프록시 호출
+        // 15:42:24.355 [main] INFO - 실제 객체 호출
+        // 15:42:25.364 [main] INFO - 두번째 호출
+        // `두번째` 호출부터 캐싱되어 실제 객체를 호출하지 않는다.
+        // 15:42:25.364 [main] INFO - 프록시 호출
+        // 15:42:25.364 [main] INFO - 세번째 호출
+        // 15:42:25.364 [main] INFO - 프록시 호출
     }
 }
 ```
@@ -386,19 +386,19 @@ public class DecoratorPatternClient {
 @Slf4j
 public class DecoratorPatternTest {
 
-		@Test
+	@Test
     @DisplayName("TimeDecorator 없이 사용")
     void noDecorator() {
         RealComponent realComponent = new RealComponent();
         DecoratorPatternClient client = new DecoratorPatternClient(realComponent);
         client.execute();
 
-				// 결과:
-				// 16:03:51.099 [main] INFO - RealComponent 실행
-				// 16:03:51.101 [main] INFO - result=data
+        // 결과:
+        // 16:03:51.099 [main] INFO - RealComponent 실행
+        // 16:03:51.101 [main] INFO - result=data
     }
 
-		@Test
+	@Test
     @DisplayName("TimeDecorator 프록시 적용하기")
     void decorator() {
         RealComponent component = new RealComponent();
@@ -406,11 +406,11 @@ public class DecoratorPatternTest {
         DecoratorPatternClient client = new DecoratorPatternClient(timeDecorator);
         client.execute();
 
-				// 결과:
-				// 16:01:46.100 [main] INFO - TimeDecorator 실행
-				// 16:01:46.103 [main] INFO - RealComponent 실행
-				// 16:01:46.104 [main] INFO - component.operation() 실행에 걸린 시간: 0
-				// 16:01:46.105 [main] INFO - result=data
+        // 결과:
+        // 16:01:46.100 [main] INFO - TimeDecorator 실행
+        // 16:01:46.103 [main] INFO - RealComponent 실행
+        // 16:01:46.104 [main] INFO - component.operation() 실행에 걸린 시간: 0
+        // 16:01:46.105 [main] INFO - result=data
     }
 }
 ```
@@ -487,22 +487,20 @@ import java.lang.reflect.Method;
 public class ReflectionTest {
 
     @Test
-    void reflection() throws ClassNotFoundException, NoSuchMethodException,
-							InvocationTargetException, IllegalAccessException {
+    void reflection() throws ClassNotFoundException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
       
-				// 런타임에 (동적으로) 어떤 메소드를 사용할지 문자열로 전달가능
+		// 런타임에 (동적으로) 어떤 메소드를 사용할지 문자열로 전달가능
         // 다만 메서드가 존재하지 않으면 런타임시간에 에러 발생
-			  // (컴파일시간에 문제를 찾을 수 없음)
+		// (컴파일시간에 문제를 찾을 수 없음)
         Class<?> classHello = Class.forName("com.example.ReflectionTest$실제객체");
         실제객체 target = new 실제객체();
         dynamicCall(classHello.getMethod("callA"), target); // 프록시 적용
         dynamicCall(classHello.getMethod("callB"), target); // 프록시 적용
     }
 
-		// 로그를 기록하는 공통 프록시 메서드. 프록시를 여러개 만들 필요가 없다.
+	// 로그를 기록하는 공통 프록시 메서드. 프록시를 여러개 만들 필요가 없다.
     // 위에서도 언급했듯 로그를 기록하는 프록시를 사용할 곳을 동적으로 설정할 수 있다. 
-    private void dynamicCall(Method method, Object target)
-										throws InvocationTargetException, IllegalAccessException {
+    private void dynamicCall(Method method, Object target) throws InvocationTargetException, IllegalAccessException {
         log.info("start"); // 로그 기록
         Object result = method.invoke(target); // 실제로직 수행
         log.info("result={}", result); // 결과 출력
@@ -624,27 +622,27 @@ public class JDkDynamicProxyTest {
         AInterface target = new AImpl();
         TimeInvocationHandler handler = new TimeInvocationHandler(target);
 
-				// java.lang.reflect.Proxy의 프록시를 동적으로 생성하는 기능 사용.
-				// 생성된 다이나믹 프록시 객체는 AInterface 인터페이스를 구현하고 있으므로 
+        // java.lang.reflect.Proxy의 프록시를 동적으로 생성하는 기능 사용.
+        // 생성된 다이나믹 프록시 객체는 AInterface 인터페이스를 구현하고 있으므로 
         // AInterface 타입으로 캐스팅해도 안전하다
         AInterface proxy = (AInterface) Proxy.newProxyInstance(
                                                 AInterface.class.getClassLoader(),
                                                 new Class[]{AInterface.class},
                                                 handler
                                             );
-				// 프록시 적용하여 실행
+		// 프록시 적용하여 실행
         proxy.call();
         log.info("targetClass={}", target.getClass());
         log.info("proxyClass={}", proxy.getClass());
     }
-/*
- dynamicA() 결과
-16:51:13.177 com.example.TimeInvocationHandler - TimeProxy 실행
-16:51:13.181 com.example.AImpl - A 호출
-16:51:13.181 com.example.TimeInvocationHandler - TimeProxy 종료 resultTime=0
-16:51:13.183 com.example.JDkDynamicProxyTest - targetClass=class com.example.AImpl
-16:51:13.183 com.example.JDkDynamicProxyTest - proxyClass=class com.sun.proxy.$Proxy8
-*/
+    /*
+        dynamicA() 결과
+        16:51:13.177 com.example.TimeInvocationHandler - TimeProxy 실행
+        16:51:13.181 com.example.AImpl - A 호출
+        16:51:13.181 com.example.TimeInvocationHandler - TimeProxy 종료 resultTime=0
+        16:51:13.183 com.example.JDkDynamicProxyTest - targetClass=class com.example.AImpl
+        16:51:13.183 com.example.JDkDynamicProxyTest - proxyClass=class com.sun.proxy.$Proxy8
+    */
 
     @Test
     void dynamicB() {
@@ -660,15 +658,14 @@ public class JDkDynamicProxyTest {
         log.info("targetClass={}", target.getClass());
         log.info("proxyClass={}", proxy.getClass());
     }
-/*
-	dynamicB() 결과
-16:51:13.193 com.example.TimeInvocationHandler - TimeProxy 실행
-16:51:13.193 com.example.BImpl - B 호출
-16:51:13.193 com.example.TimeInvocationHandler - TimeProxy 종료 resultTime=0
-16:51:13.193 com.example.JDkDynamicProxyTest - targetClass=class com.example.BImpl
-16:51:13.193 com.example.JDkDynamicProxyTest - proxyClass=class com.sun.proxy.$Proxy9
-
-*/
+    /*
+	    dynamicB() 결과
+        16:51:13.193 com.example.TimeInvocationHandler - TimeProxy 실행
+        16:51:13.193 com.example.BImpl - B 호출
+        16:51:13.193 com.example.TimeInvocationHandler - TimeProxy 종료 resultTime=0
+        16:51:13.193 com.example.JDkDynamicProxyTest - targetClass=class com.example.BImpl
+        16:51:13.193 com.example.JDkDynamicProxyTest - proxyClass=class com.sun.proxy.$Proxy9
+    */
 
 }
 ```
@@ -753,14 +750,14 @@ public class AdvisorTest {
 	void advisorTest1() {
 	    ServiceImpl target = new ServiceImpl();
 	    ProxyFactory proxyFactory = new **ProxyFactory**(target); // 프록시 생성
-		  DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(
-								            new APointcut(), // 특정 조건을 만족했을때만 프록시가 동작하도록 설정
-											new TimeAdvice()
+		DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(
+                                        new APointcut(), // 특정 조건을 만족했을때만 프록시가 동작하도록 설정
+                                        new TimeAdvice()
 									);
 
-		  proxyFactory.addAdvisor(advisor);
+		proxyFactory.addAdvisor(advisor);
 			
-			// 프록시 객체 반환 
+		// 프록시 객체 반환 
 	    ServiceInterface proxy = (ServiceInterface) proxyFactory.getProxy(); 
 	    proxy.save(); // TimeAdvice.invoke(proxy.save());
 	    proxy.find(); // TimeAdvice.invoke(proxy.find());
@@ -797,7 +794,7 @@ public class AdvisorTest {
 
         @Override
         public boolean isRuntime() {
-						return false; // false이면 위의 matches가, true이면 아래의 matches가 실행됨
+		    return false; // false이면 위의 matches가, true이면 아래의 matches가 실행됨
         }
 
         @Override
@@ -840,26 +837,26 @@ advice, advisor, advice 이해를 돕기 위한 그림. advisor가 등록된 상
 void advisorTest2() {
     ServiceImpl target = new ServiceImpl();
     ProxyFactory proxyFactory = new ProxyFactory(target);
-	  /* 
-		// 기존 방식
-		DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(
-							      new APointcut(), 
-										new TimeAdvice()
-								);
-		*/
+	/* 
+	// 기존 방식
+	DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(
+							    new APointcut(), 
+								new TimeAdvice()
+						);
+	*/
 
-	  // 포인트컷을 생성하는 다른 방법
-		**AspectJExpressionPointcut aspectJPointcut = new AspectJExpressionPointcut();**
-		**aspectJPointcut.setExpression("execution(* *..save*(..))");**
+	// 포인트컷을 생성하는 다른 방법
+	**AspectJExpressionPointcut aspectJPointcut = new AspectJExpressionPointcut();**
+	**aspectJPointcut.setExpression("execution(* *..save*(..))");**
 
     DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(
-							      **aspectJPointcut**, // aspectJ 방식으로 설정된 Pointcut를 advisor에 등록
-									new TimeAdvice()
-		);
+                                **aspectJPointcut**, // aspectJ 방식으로 설정된 Pointcut를 advisor에 등록
+                                new TimeAdvice()
+		                );
 
-	  proxyFactory.addAdvisor(advisor);
+	proxyFactory.addAdvisor(advisor);
 		
-		// 프록시 객체 반환 
+	// 프록시 객체 반환 
     ServiceInterface proxy = (ServiceInterface) proxyFactory.getProxy(); 
     proxy.save(); // TimeAdvice.invoke(proxy.save());
     proxy.find(); // TimeAdvice.invoke(proxy.find());
@@ -1165,8 +1162,7 @@ public class AopMethodTest {
         }
 
         @Around("allMember() && args(arg123, ..)")
-        public Object logArgs2(ProceedingJoinPoint joinPoint, Object arg123)
-																throws Throwable {
+        public Object logArgs2(ProceedingJoinPoint joinPoint, Object arg123) throws Throwable {
             log.info("[arg2] {}, [args2]={}", arg123, joinPoint.getSignature());
             return joinPoint.proceed();
         }
@@ -1183,8 +1179,7 @@ public class AopMethodTest {
          * aop 를 수행한다.
          */
         @Around("allMember() && target(obj456)")
-        public Object targetArgs(ProceedingJoinPoint joinPoint, MemberService obj456)
-																throws Throwable {
+        public Object targetArgs(ProceedingJoinPoint joinPoint, MemberService obj456) throws Throwable {
             // target.obj: 실제 객체
             log.info("[target] {} obj={}", joinPoint.getSignature(), obj456.getClass());
             return joinPoint.proceed();
@@ -1205,8 +1200,7 @@ public class AopMethodTest {
         }
 
         @Around("allMember() && @target(annotation11)")
-        public Object atTargetArgs(ProceedingJoinPoint joinPoint, ClassAop annotation11)
-																throws Throwable {
+        public Object atTargetArgs(ProceedingJoinPoint joinPoint, ClassAop annotation11) throws Throwable {
             log.info("[@target]{}, obj={}", joinPoint.getSignature(), annotation11);
             return joinPoint.proceed();
         }
@@ -1218,8 +1212,7 @@ public class AopMethodTest {
 
         @Before("allMember() && @annotation(annotation11)")
         public void atAnnotation(JoinPoint joinPoint, MethodAop annotation11) {
-            log.info("[@annotation]{}, annotationValue={}", joinPoint.getSignature(),
-														annotation11.value());
+            log.info("[@annotation]{}, annotationValue={}", joinPoint.getSignature(), annotation11.value());
         }
     }
 }

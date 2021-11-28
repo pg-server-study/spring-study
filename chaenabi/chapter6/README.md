@@ -1986,3 +1986,633 @@ void test() {
     log.info("부모클래스.어떤필드변수의 값: {}", 프록시.어떤필드변수); // 이상없음
 }
 ```
+
+# 트랜잭션
+
+---
+
+## 트랜잭션 정의
+
+---
+
+`트랜잭션`이라고 모두 같은 방식으로 동작하는 것은 아니다.
+
+물론 트랜잭션의 기본 개념인 "***더 이상 쪼갤 수 없는 최소 단위의 작업***"이라는 개념은 항상 유효하다.
+
+트랜잭션 경계 안에서 진행된 작업은 `commit()`을 통해 모두 성공하든지
+
+아니면 `rollback()`을 통해 모두 취소 되어야 한다.
+
+그런데 이 밖에도 트랜잭션의 동작방식을 제어할 수 있는 4가지 속성이 있다.
+
+## 트랜잭션 전파
+
+---
+
+`트랜잭션 전파`(transaction propagation)이란 트랜잭션의 경계에서
+이미 진행 중인 트랜잭션이 있을 때 (또는 없을 때) 어떻게 동작할 것인가를 결정하는 방식이다.
+
+대표적으로 다음과 같은 `전파 속성`을 설정할 수 있다.
+
+### PROPAGATION REQUIRED
+
+---
+
+진행 중인 트랜잭션이 없으면 새로 시작하고, 이미 시작된 트랜잭션이 있으면 이에 참여한다.
+DefaultTransactionDefinition의 트랜잭션 기본 전파 속성은 `PROPAGATION_REQUIRED` 이다.
+
+### PROPAGATION REQUIRES NEW
+
+---
+
+항상 새로운 트랜잭션을 시작한다.
+앞에서 시작된 트랜잭션이 있든없든 상관없이 새로운 트랜잭션을 만들어 독자적으로 동작한다.
+
+### PROPAGATION NOT SUPPORTED
+
+---
+
+이 속성을 사용하면 트랜잭션 없이 동작하도록 만들 수도 있다.
+진행 중인 트랜잭션이 있어도 무시된다.
+
+---
+
+이렇게 트랜잭션 매니저를 통해 트랜잭션을 시작하려고 할 때 `getTransaction()` 메소드를 사용하는 이유는 항상 트랜잭션을 새로 시작하는 것이 아니기 때문이다.
+
+앞서 설명한 옵션을 적절히 사용하여 새로 시작할 수도 있고, 현재 진행 중인 트랜잭션에 참여해서 동작하게 할 수도 있다.
+
+## 격리 수준 (isolation)
+
+---
+
+모든 DB 트랜잭션은 `격리수준`(isolation level)을 가지고 있어야 한다.
+
+서버 환경에서는 여러 개의 트랜잭션이 동시에 진행될 수 있기 때문이다.
+순차적으로 진행되어 독립적이면 좋겠지만 `성능`이 크게 떨어질 수 밖에 없다.
+
+따라서, 적절하게 격리수준을 조정해서 가능한 한 많은 트랜잭션을 `동시에 진행`시키면서도 문제가 발생하지 않게 하는 `제어가 필요`하다.
+
+격리수준은 기본적으로 DB에 설정되어 있지만 JDBC Driver나 DataSource 등에서 재설정할 수 있고, 필요하다면 트랜잭션 단위로 격리수준을 조정할 수 있다.
+
+## 제한 시간 (timeout)
+
+---
+
+트랜잭션을 수행할 `제한 시간`(timeout)을 설정할 수 있다.
+‘DefaultTransactionDefinition’의 기본 설정은 제한시간이 없고 `제한 시간`은 트랜잭션을 직접 시작할 수 있는 `PROPAGATION_REQUIRED`, `PROPAGATION_REQUIRES_NEW`와 함께 사용해야만 의미가 있다.
+
+## 읽기 전용 (readonly)
+
+---
+
+`읽기 전용`(read-only)으로 설정해두면 트랜잭션 내에서 데이터를 조작하는 시도를 막아줄 수 있고 데이터 액세스 기술에 따라서 `성능이 향상`될 수도 있다.
+
+## 트랜잭션 인터셉터(TransactionAdvice)와 트랜잭션 속성
+
+---
+
+메소드 별로 다른 트랜잭션 정의를 적용하려면 Advice의 기능을 확장해야 한다.
+
+이 것은 메소드 이름 패턴에 따라 다른 트랜잭션 정의가 되도록 구현하는 것과 비슷하다.
+
+스프링은 트랜잭션 경계설정 어드바이스로 사용할 수 있도록 `TransactionInterceptor`을 제공한다.
+
+`TransactionInterceptor`은 `PlatformTransactionManager`와 `Properties` 타입의
+두 가지 프로퍼티를 가지고 있다.
+
+그리고 스프링이 제공하는 `TransactionInterceptor`에는 기본적으로
+두 가지 종류의 예외 처리 방식이 있다.
+
+- 런타임 예외(언체크 예외) : 트랜잭션이 롤백된다.
+- 체크 예외 : 예외상황으로 해석하지 않고 일종의 비즈니스 로직에 따른,
+의미가 있는 리턴 방식의 한 가지로 인식해서 트랜잭션을 커밋한다.
+
+이렇게 동작되는 이유는
+
+스프링의 기본적인 예외처리 원칙에 따라 **비즈니스적인 의미가 있는 예외상황에만** 체크 예외를 사용하고, 그 외의 모든 복구 불가능한 순수한 예외의 경우는 런타임 예외로 포장돼서 전달하는 방식을 따른다고 가정하기 때문이다.
+
+## 포인트컷과 트랜잭션 속성의 적용 전략
+
+---
+
+1.  **트랜잭션 포인트컷 표현식은 타입 패턴이나 빈 이름을 이용한다.**
+2. **공통된 메소드 이름 규칙을 통해 최소한의 트랜잭션 어드바이스와 속성을 정의한다.**
+3. **프록시 방식 AOP는 같은 타겟 오브젝트 내의 메소드를 호출할 때는 적용되지 않는다.**
+(자기 자신의 메소드를 호출할 때는 프록시를 통한 부가기능의 적용이 일어나지 않는다.)
+
+**프록시 방식의 AOP의 경우 프록시를 통한 부가기능의 적용이
+클라이언트로부터 호출이 일어날 때만 가능하다.**
+
+![aop-1.jpg](6장_asset/aop-1.jpg)
+
+- `[1], [3]`은 클라이언트로부터 메소드가 호출되면
+프록시를 통해 타겟에게 전달되므로 트랜잭션 경계설정 기능이 부여된다.
+- `[2]`는 타깃 오브젝트 내로 들어와서 다른 메소드를 호출하는 경우에는 프록시를 거치지 않고 직접 타겟의 메소드가 호출되어 부가기능이 적용되지 않는다.
+
+타겟 안에서의 호출에는 프록시가 적용되지 않는 문제를 `해결할 수 있는 방법`이 두 가지가 있다.
+
+1. 스프링 API(ApplicationContext 등)를 이용해 프록시 오브젝트에 대한 레퍼런스를 가져온 뒤에 같은 오브젝트의 메소드 호출도 `프록시를 이용하도록 강제`하는 방법
+2. 타겟 클래스 안에서 같은 타켓 클래스를 DI함으로 스프링컨텍스트에 등록된 타겟프록시객체를 가져와 호출하는 방법 
+3. `AspectJ`와 같은, 타겟의 `바이트코드를 직접 조작`하는 방식의 AOP 기술을 적용
+
+1번 및 2번의 방식을 사용하여 해결하는 코드는 다음과 같다.
+
+```java
+// 적용하고 싶은 프록시 (로그 찍기용 프록시) 
+@Slf4j
+@Aspect
+public class CallLogAspect {
+
+    @Before("execution(* com.example.internalcall..*.*(..))")
+    public void doLog(JoinPoint joinPoint) {
+        log.info("aop={}\n", joinPoint.getSignature());
+    }
+}
+```
+
+```java
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.stereotype.Component;
+
+@Slf4j
+@Component
+@RequiredArgsConstructor
+public class CallServiceV0 {
+
+    // 1--- 내부호출에도 AOP 를 적용할 수 있도록 해결하는 방법
+    // 1--- (아래의 여러가지 방법 중에서 한가지를 선택해서 사용하면 된다.)
+
+    // *1. 자기자신 주입
+    // 참고: 자기 자신을 생성자 주입하는 것은 순환 사이클을 만들기 때문에 실패한다.
+    // 필드 주입 또는 Setter 주입 방식 으로 해결해야 한다.
+    //@Autowired
+    private CallServiceV0 callServiceV0;
+
+    @Autowired
+    public void setCallServiceV0(CallServiceV0 callServiceV0) {
+        log.info("callServiceV0 setter={}", callServiceV0.getClass());
+        this.callServiceV0 = callServiceV0;
+    }
+
+    // 2--- 내부호출에도 AOP 를 적용할 수 있도록 해결하는 방법
+    // 2--- (여러가지 방법 중에서 한가지를 선택해서 사용하면 된다.)
+
+    // *2. ApplicationContext 생성자 주입하여 bean 을 꺼내 internal 호출
+    private final ApplicationContext applicationContext;
+
+    // 3--- 내부호출에도 AOP 를 적용할 수 있도록 해결하는 방법
+    // 3--- (여러가지 방법 중에서 한가지를 선택해서 사용하면 된다.)
+
+    // *3. ObjectProvider 생성자 주입하여 bean 을 꺼내 internal 호출:
+    // applicationContext 는 기능이 너무 많은 무거운 객체이므로
+    // 상대적으로 덜 무거운 객체를 사용하는 방법이다.
+    // (ObjectProvider 는 빈 객체를 스프링 컨테이너에서 꺼내는 것에만 특화된 객체이다.)
+    private final ObjectProvider<CallServiceV0> callServiceV0Provider;
+
+    // 4--- 내부호출에도 AOP 를 적용할 수 있도록 해결하는 방법
+    // 4--- (여러가지 방법 중에서 한가지를 선택해서 사용하면 된다.)
+
+    // *4. 구조 변경 (중첩 클래스를 사용해도 되고, 클래스를 완전히 분리해도 된다.
+    // (이 프로젝트 내에서는 아래의 중첩 클래스만 만들어 사용했다.))
+    private final InternalService internalService;
+
+    @Component
+    static class InternalService {
+        public void internal() {
+            log.info("call internal\n");
+        }
+    }
+
+    public void external() {
+        int seq = 0;
+
+        log.info("call external\n");
+        log.info("aop 적용 실패 case {}: this.internal()", ++seq);
+        this.internal(); // *0. 문제점 발생: 내부 메서드 호출하는데, aop 호출이 안 됨.
+                         // 이유: this 는 CallServiceV0를 뜻하며,
+                         //다시말해 this 가 스프링 빈으로 등록된 
+                    // CallServiceV0$$EnhancerBySpringCGLIB 프록시 객체가 아니기 때문이다.
+                    // CallServiceV0는 프록시 객체가 아니기 때문에
+                    // AOP 작업도 수행되지 않으며 어드바이스도 적용이 불가능해진다.
+
+        log.info("aop 적용 성공 case {}: callServiceV0.internal()", ++seq);
+        // *1-1. internal() 호출: AOP 적용가능: 사실상
+        //                      외부에서 internal()을 호출하는 것과 동일.
+        // (외부에서 aop 프록시로 등록된 callServiceV0$EnhancerBySpringCGLIB 의
+        //   internal()을 호출하는 방식이다.)
+        callServiceV0.internal();
+
+        // *2-1. 애플리케이션 컨텍스트에서 꺼내서 사용: AOP 적용가능:
+        // @Aspect 활성화시 스프링 빈으로 등록되는 것은 실제 객체인 CallServiceV0가 아니라
+        // CallServiceV0$$EnhancerBySpringCGLIB 프록시 객체에 가능한 것이다..
+        CallServiceV0 bean = applicationContext.getBean(CallServiceV0.class);
+        log.info("aop 적용 성공 case {}: bean.internal()", ++seq);
+        bean.internal();
+
+        // *3-1. ObjectProvider 에서 꺼내서 사용: AOP 적용가능:
+        CallServiceV0 object = callServiceV0Provider.getObject();
+        log.info("aop 적용 성공 case {}: object.internal()", ++seq);
+        object.internal();
+
+        // *4-1. 구조 변경 (internal() 메서드를 다른 클래스로 분화시켜 주입 받게 한다.)
+        log.info("aop 적용 성공 case {}: internalService.internal()", ++seq);
+        internalService.internal();
+    }
+
+    public void internal() {
+        log.info("call internal\n");
+    }
+}
+```
+
+```java
+// 실제 테스트
+@Slf4j
+@Import(CallLogAspect.class)
+@SpringBootTest
+class CallLogAspectTest {
+
+  @Autowired
+  private CallServiceV0 callServiceV0;
+
+  @Test
+  void external() {
+      log.info("callServiceV0={}\n", callServiceV0.getClass()); // CGLIB 프록시객체 프린트.
+                                                       // (@Import 안하면 실제 객체 반환)
+      callServiceV0.external(); // external 에서 internal 을 호출하지만
+                                // external() 실행시에만 aop 가 적용되고
+                                // internal()에는 aop 가 적용되지 않는다.
+                                // internal()은 CallServiceV0에 있는 것으로 호출되는 것이지
+                          // CGLIB 프록시 객체의 internal() 을 호출하는 것이 아니기 떄문이다.
+                                // 따라서 어드바이스도 동작하지 않는다.
+  }
+
+  @Test
+  void internal() {
+      callServiceV0.internal(); // aop 적용된다.
+          // (사실 이것은 당연하다... external() 내부에서 internal()을 호출한 것이 아니라,
+          // 외부에서 internal()을 호출했기 때문이다.)
+          // 어쨌든 지금은 프록시 방식의 AOP 의 경우, 메서드 내부 호출에
+          // 프록시를 적용할 수 없다는 문제점이 있다는 것만 알아두자.
+          // (프록시 방식의 AOP 에 조작을 가해 메서드 내부 호출에도 프록시를 적용할 수 있도록
+          // 해결하는 방법들이 존재하며 그 해결방법들은
+          // *기수 방식으로(*1. *2. *3. ... ) CallServiceV0 클래스에 작성되어 있다.
+  }
+
+}
+```
+
+## 트랜잭션 어노테이션
+
+---
+
+### 트랜잭션 경계 설정의 일원화
+
+- 트랜잭션 경계설정의 부가기능을 여러 계층에서 중구난방으로 적용하는 것은 좋지 않다.
+
+- 비즈니스 로직을 담고 있는 서비스 계층 오브젝트의 메소드가
+트랜잭션 경계를 부여하기에 가장 적절한 대상에 해당된다.
+
+- 테스트 등과 같은 특별한 이유가 아니라면
+**다른 계층이나 모듈에서 `DAO`를 직접 접근하는 것은 차단되어야 한다.**
+
+- 많은 경우 DAO는 Service 계층을 통해서 접근하는 것이 옳다.
+
+## 애노테이션 트랜잭션 속성과 포인트컷
+
+---
+
+포인트컷 표현식과 트랜잭션 속성을 이용해 트랜잭션을 일괄적으로 적용하는 방식은
+
+복잡한 트랜잭션 속성이 요구되지 않는 한 꽤 잘 먹히는 방법이다. (간단한 트랜잭션에서는 효율적)
+
+그런데 가끔은 `클래스`나 `메서드` 단위의 **세밀하게** 튜닝된 트랜잭션 속성을 적용해야 하는 경우에는
+
+매번 포인트컷이나 어드바이스를 추가해야하기 때문에 적합하지 않다.
+
+이런 세밀한 트랜잭션 속성의 제어를 위해
+
+스프링은 "직접 타겟에 애노테이션을 지정하는 방법"을 제공한다. (@Transactional)
+
+## 트랜잭션 어노테이션
+
+---
+
+```java
+// @Transaction 어노테이션 선언 구조
+
+@Target({ElementType.METHOD, ElementType.TYPE}) // 애노테이션을 사용할 대상을 지정
+@Retention(RetentionPolicy.RUNTIME) // 애노테이션 정보가 언제까지 유지되는지
+@Inherited // 상속을 통해서도 애노테이션 정보를 얻을 수 있도록
+@Documented
+// 트랜잭션 속성의 모든 항목을 엘리먼트로 지정 가능,
+// 디폴트 값이 설정되어 있으므로 모두 생략이 가능
+public @interface Transactional {
+
+	String value() default "";
+
+	Propagation propagation() default Propagation.REQUIRED; // 트랜잭션 전파속성 설정
+
+	Isolation isolation() default Isolation.DEFAULT; // 격리수준 설정
+
+	int timeout() default TransactionDefinition.TIMEOUT_DEFAULT; // 트랜잭션 실행시간 제한
+
+	boolean readOnly() default false; // 트랜잭션을 읽기전용으로 설정
+
+	Class<? extends Throwable>[] rollbackFor() default {}; // 롤백 조건 설정
+
+	String[] rollbackForClassName() default {}; // 롤백 조건을 클래스명 기준으로 설정
+
+	Class<? extends Throwable>[] noRollbackFor() default {};//에러가발생해도 롤백하지 않도록
+
+	String[] noRollbackForClassName() default {}; 
+}
+```
+
+`@Transactional`을 적용할 수 있는 곳은 `메소드`와 `타입`(인터페이스, 클래스)이다.
+
+`@Transaction`은 기본적으로 `트랜잭션 속성을 지정`하는 것이지만,
+
+동시에 `포인트컷의 자동 등록`에도 사용된다.
+
+다음 그림은 `@Transactional`을 사용했을 때 어드바이저의 동작 방식이다.
+
+![해당 포인트컷과 어드바이스, 트랜잭션 어노테이션은 모두 org.springframework.transaction 패키지에 있다.
+이때 포인트컷에 해당하는 TransactionAttributeSourcePointcut은 추상클래스이며, public이 아니므로 외부에서
+사용할 수는 없다.](6장_asset/aop-2.png)
+해당 포인트컷과 어드바이스, 트랜잭션 어노테이션은 모두 org.springframework.transaction 패키지에 있다.
+이때 포인트컷에 해당하는 TransactionAttributeSourcePointcut은 추상클래스이며, public이 아니므로 외부에서
+사용할 수는 없다.
+
+```java
+@Test
+@DisplayName("간략하게 구현된 @Transactional 동작 방식." +
+              "포인트컷을 import하지 못하기 떄문에 동작은 되지 않는다.")
+void advisorTest3() {
+    // ServiceImpl은 @Transactional이 붙은 ServiceInterface를 상속받아 구현되어 있다.
+    ServiceImpl target = new ServiceImpl();
+    
+    // 프록시 팩토리를 사용해 타겟 클래스의 프록시 객체 생성
+    ProxyFactory proxyFactory = new ProxyFactory(target);
+    TransactionAttributeSourceAdvisor advisor;
+
+    advisor = new TransactionAttributeSourceAdvisor(
+					new TransactionAttributeSourcePointCut(),
+                    new TransactionInterceptor()
+              ); // 트랜잭션 포인트컷과 어드바이스(인터셉터)가 적용된 어드바이저 초기화
+
+    proxyFactory.addAdvisor(advisor); // 타겟 클래스에 어드바이저 등록
+    
+    ServiceInterface proxy = (ServiceInterface) proxyFactory.getProxy(); //프록시객체get
+
+    // 트랜잭션 실행
+    // (PROPAGATION_REQUIRED가 설정되어있다면 아래의 두 메서드는 하나의 트랜잭션으로 동작한다. 
+    proxy.save(); // save에 @Transactional이 적용되어 있어 트랜잭션이 활성화된다.
+    proxy.find(); // 마찬가지로 @Transactional이 적용되어 있어 트랜잭션이 활성화된다.
+}
+```
+
+@Transactional 방식을 이용하면 포인트컷과 트랜잭션 속성을 어노테이션 하나로 지정할 수 있다.
+
+이 어노테이션은 타입에 부여하여 해당 타입의 모든 메소드에 일괄 적용할 수도 있지만
+
+메소드 단위로 세분화해서 트랜잭션 속성을 다르게 지정할 수도 있기 때문에
+
+매우 세밀한 트랜잭션 속성 제어가 가능해진다는 장점이 있다.
+
+## 대체 정책
+
+---
+
+스프링은 `@Transactional`을 적용할 때 4단계의 대체(fallback)정책을 지원한다.
+
+4단계 대체 정책은 다음과 같다.
+
+1. 타겟 메소드에 @Transactional이 있는지 확인
+2. @Transactional이 부여되어 있다면 이를 속성으로 사용
+3. 없다면, 다음 대체 후보인 타겟 클래스에 부여된 @Transactional를 찾음
+4. 메소드 레벨에는 없지만, 클래스 레벨에 @Transactional이 존재하면
+이를 메소드의 트랜잭션으로 사용
+
+```java
+// @Transactional 대체 정책의 예
+// [number] 위치에 @Transactional을 붙였을 때 적용됨
+// [number] 숫자가 낮을수록 높은 우선순위로 작동함
+
+// [4]
+public interface Service {
+	// [3]
+	void method1();
+	// [3]
+	void method2();
+}
+
+// 타겟 클래스 [2]
+public class Servicelmpl implements Service {
+	// [1]
+	public void method1() (
+	// [1]
+	public void method2() {
+}
+```
+
+`@Transactional`도 타겟 클래스보다는 인터페이스에 두는 게 바람직하다.
+
+하지만 인터페이스를 사용하는 프록시 방식의 AOP가 아닌 방식(CGLIB 등)으로 트랜잭션을 적용하면
+
+인터페이스에 정의한 `@Transactional`은 무시되기 때문에
+
+CGLIB의 경우 안전하게 (메서드보다는) 타겟 클래스에 `@Transactional`을 두는 방법을 사용한다.
+
+단, 인터페이스에 `@Transactional`를 두면 구현 클래스가 바뀌더라도 트랜잭션 속성을 유지할 수 있다는 장점이 있다.
+
+## 트랜잭션 지원 테스트
+
+---
+
+### 트랜잭션 동기화와 테스트
+
+- **트랜잭션 추상화 기술의 핵심은** `**TransactionManager**`와 `**트랜잭션 동기화**`라고 할 수 있다.
+    - 트랜잭션 매니저 : PlatformTransactionManager 인터페이스를 구현한 트랜잭션 매니저를 통해
+
+    구체적인 트랜잭션 기술의 종류에 상관없이 일관된 트랜잭션 제어가 가능
+
+    - 트랜잭션 동기화 : 트랜잭션 동기화 기술이 있었기에 시작된 트랜잭션 정보를 저장소에 보관해뒀다가 DAO에서 공유 가능
+
+트랜잭션 동기화 기술은 트랜잭션 전파를 위해서도 다음과 같은 중요한 역할을 한다.
+
+1. 진행 중인 트랜잭션이 있는지 확인
+2. 트랜잭션 전파 속성에 따라서 이에 참여할 수 있도록 만들어 준다.
+
+이 모든 것은 `트랜잭션 동기화` 기술 덕분에 가능하다.
+
+이제 한번 간단한 테스트를 추가해보자.
+
+```java
+@Test
+public void transactionSync() {
+    userService.deleteAll();
+    userService.add(users.get(0));
+    userService.add(users.get(1));
+}
+```
+
+**`transactionSync()` 테스트 메소드가 실행되는 동안 몇 개의 트랜잭션이 만들어 졌을까?**
+
+정답은 `UserService`의 모든 메소드에 트랜잭션을 적용했으니 3개가 적용됩니다.
+
+---
+
+**그렇다면, 이 테스트 메소드에서 만들어지는 세 개의 트랜잭션을 하나로 통합하려면 ?**
+
+`하나의 커넥션을 사용`해서 트랜잭션을 유지하는 것이 필요하다.
+
+다시 말해 3개의 동작이 이루어지기 전에 트랜잭션을 `미리 시작`해둠으로서 해결한다.
+
+```java
+// 세 개의 트랜잭션을 하나로 통합 
+@Test
+public void transactionSync() {
+    DefaultTransactionDefinition definition = new DefaultTransactionDefinition();
+    TransactionStatus status = transactionManager.getTransaction(definition);
+
+    userService.deleteAll();
+    userService.add(users.get(0));
+    userService.add(users.get(1));
+
+    transactionManager.commit(status);
+}
+```
+
+### 
+
+### 롤백 테스트
+
+---
+
+테스트 코드로 트랜잭션을 제어해서 적용할 수 있는 테스트 기법을 `롤백 테스트`라고 한다.
+
+`롤백 테스트`는 테스트 내의 모든 DB 작업을 하나의 트랜잭션 안에서 동작하게 하고
+
+테스트가 끝나면 **무조건** 롤백해버리는 테스트를 말한다.
+
+다음과 같은 코드가 전형적 롤백 테스트라고 할 수 있다.
+
+```java
+@Test
+public void transactionSync() {
+    DefaultTransactionDefinition txDefinition = new DefaultTransactionDefinition();
+    TransactionStatus txStatus = transactionManager.getTransaction(txDefinition);
+
+    try {
+        userService.deleteAll();
+        userService.add(users.get(0));
+        userService.add(users.get(1));
+    } finally {
+        transactionManager.rollback(txStatus);
+    }
+}
+```
+
+`롤백 테스트`는 DB작업이 포함된 테스트가 수행되어도 **DB에 영향을 주지 않기 때문에** `장점`이 많다.
+
+복잡한 데이터를 바탕으로 동작하는 기능을 테스트하려면
+
+테스트가 실행될 때의 DB 데이터와 상태가 매우 중요하다.
+
+문제는 테스트를 실행할 때마다 데이터가 변한다는 것인데,
+
+이런 문제를 `롤백 테스트`로 해결할 수 있다.
+
+롤백 테스트는 심지어 여러 개발자가 하나의 공용 테스트용 DB를 사용할 수 있게 도와준다.
+
+적절한 격리 수준만 보장해주면 동시에 여러 개의 테스트가 진행되어도 상관없다.
+
+## 테스트를 위한 트랜잭션 어노테이션
+
+---
+
+스프링의 컨텍스트 테스트 프레임워크는 `@Transactional` 어노테이션을 이용해
+
+테스트를 편리하게 만들 수 있는 여러 가지 기능을 지원한다.
+
+다시 말해 테스트에도 `@Transaction`을 적용할 수 있다.
+
+테스트 클래스, 메소드에 `@Transaction`을 적용하면
+
+마치 타겟 클래스나 인터페이스에 적용한 것처럼
+
+테스트 메소드에 트랜잭션 경계가 `자동으로 설정`된다.
+
+물론 테스트에서 사용하는 `@Transaction`은 AOP를 위한 것은 아니다.
+
+하지만 기본적인 동작방식과 속성은 `UserService` 등에 적용한 `@Transactional`과 동일하므로
+이해하기 쉽고 사용하기 편리하다.
+
+```java
+// **하나의 트랜잭션으로 동작하는 테스트.** 
+@Test
+@Transactional
+public void transactionSync(){
+    userService.deleteAll();
+    userService.add(users.get(0));
+    userService.add(users.get(1));
+}
+```
+
+### @Rollback
+
+---
+
+테스트용 트랜잭션은 테스트가 끝나면 자동으로 롤백된다! 
+(`@Transactional`을 지정해주기만 하면 자동으로 `롤백테스트`로 설정된다.)
+
+롤백되기를 원하지 않는다면 `@Rollback`이라는 애노테이션을 사용하면 되는데,
+
+`@Rollback`은 롤백 여부를 지정하는 값을 가지고 있으며, 기본 값은 true이다.
+
+ `@Rollback(false)`라 설정하면 롤백을 하지 않고 실제 데이터베이스에 트랜잭션 내용이 적용된다.
+
+**만약 테스트 클래스의 모든 메소드에 트랜잭션을 적용하면서
+롤백되지 않고 커밋되게 하려면 아래와 같이 작성하면 된다.**
+
+ 
+
+```java
+@TransactionConfiguration(defaultRollback=false)
+public class TestClass {
+   ...
+}
+```
+
+### Propagation.NEVER
+
+---
+
+트랜잭션이 일부 메서드에서 필요없는 경우가 있을 수 있다.
+
+이런 경우
+
+```java
+@Transactional(propagation = Propagation.NEVER)
+void dontNeedTransaction() { ... }
+```
+
+위의 어노테이션을 테스트 메소드에 지정하면 트랜잭션이 시작되지 않고 동작한다.
+
+### 효과적인 DB 테스트
+
+---
+
+- 단위 테스트와 DB 같은 외부 리소스가 참여하는 통합 테스트는 아예 클래스를 구분.
+
+- DB가 사용되는 통합 테스트는 가능한 한 롤백 테스트로 만드는 게 좋음.
+    - `@Transactional`을 사용해서 롤백 테스트로 만든다.
+    - 테스트가 기본적으로 롤백 테스트로 되어 있다면 테스트 사이에
+    서로 영향을 주지 않으므로 독립적이고 자동화된 테스트로 만들기 편리하다.
+
+- 테스트는 어떤 경우에도 서로 의존하면 안됨

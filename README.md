@@ -80,6 +80,6 @@
 | 닉네임    | 정리                                                         |
 | --------- | ------------------------------------------------------------ |
 | BEST      | []()
-| pursue503 | [6장 - AOP]()|
-| minnim6   | [6장 - AOP]()|
-| chaenabi   | [6장 - AOP]()|
+| pursue503 | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/JH/JH/chapter6)|
+| minnim6   | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/jeom/jeom/chatper6)|
+| chaenabi   | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/chaenabi/chaenabi/chapter6)|

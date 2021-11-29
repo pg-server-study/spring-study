@@ -72,3 +72,14 @@
 | pursue503 | [5장 - 서비스 추상화](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter5)|
 | minnim6   | [5장 - 서비스 추상화](https://github.com/pg-server-study/spring-study/tree/main/jeom/chapter5)|
 | chaenabi   | [5장 - 서비스 추상화](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter5)|
+
+### Chapter6
+
+**AOP**
+
+| 닉네임    | 정리                                                         |
+| --------- | ------------------------------------------------------------ |
+| BEST      | []()
+| pursue503 | [5장 - 서비스 추상화]()|
+| minnim6   | [5장 - 서비스 추상화]()|
+| chaenabi   | [5장 - 서비스 추상화]()|

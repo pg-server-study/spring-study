@@ -79,7 +79,7 @@
 
 | 닉네임    | 정리                                                         |
 | --------- | ------------------------------------------------------------ |
-| BEST      | [@](https://github.com/pg-server-study/spring-study/tree/chaenabi/chaenabi/chapter6)
-| pursue503 | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/JH/JH/chapter6)|
-| minnim6   | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/jeom/jeom/chatper6)|
-| chaenabi   | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/chaenabi/chaenabi/chapter6)|
+| BEST      | [@chaenabi](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter6)
+| pursue503 | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter6)|
+| minnim6   | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/main/jeom/chatper6)|
+| chaenabi   | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter6)|

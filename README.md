@@ -24,7 +24,7 @@
 
 |닉네임| 정리
 | ---- | --- |
-| BEST | [@chaenabi](https://reminiscent-headlight-ee3.notion.site/4-1a42c978e0af4509a679bd713fb13175)
+| BEST | [@chaenabi](https://reminiscent-headlight-ee3.notion.site/1-fd3ff68f48434297a01ace0577a52e76)
 | pursue503 | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter1)
 | minnim6 | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/blob/main/jeom/README.md.md)
 | chaenabi | [1장 - 오브젝트와 의존관계](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter1)

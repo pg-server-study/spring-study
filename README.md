@@ -79,7 +79,7 @@
 
 | 닉네임    | 정리                                                         |
 | --------- | ------------------------------------------------------------ |
-| BEST      | [@chaenabi](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter6)
+| BEST      | [@chaenabi](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter6)|
 | pursue503 | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter6)|
 | minnim6   | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/main/jeom/chatper6)|
 | chaenabi   | [6장 - AOP](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter6)|
@@ -90,7 +90,7 @@
 
 | 닉네임    | 정리                                                         |
 | --------- | ------------------------------------------------------------ |
-| BEST      | [@](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter9)|
+| BEST      | [@chaenabi](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter9)|
 | pursue503 | [9장 - 스프링 프로젝트 시작하기](https://github.com/pg-server-study/spring-study/tree/main/JH/chapter9)|
 | minnim6   | [9장 - 스프링 프로젝트 시작하기](https://github.com/pg-server-study/spring-study/tree/main/jeom/chatper9)|
 | chaenabi   | [9장 - 스프링 프로젝트 시작하기](https://github.com/pg-server-study/spring-study/tree/main/chaenabi/chapter9)|
